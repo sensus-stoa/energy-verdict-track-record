@@ -9,14 +9,12 @@ trust/evidence-manifest.json (criteria_lock). Any change to these criteria
 after the lock commit is a new version marked post-hoc and requires a
 re-run for PASS.
 
-Scope of this record version: the full defect-class battery of 6 planted
-defective cases (N=1 each: look-ahead leak, DST/timezone handling,
-backtest contamination, target leakage, cherry-picked metric, selection
-bias) and 5 clean cases (N=1 each: linear, scaled ridge, gradient boosting,
-timezone-aware hourly, scaled ElasticNet), plus the NC-NULL negative
-control (N=5). This satisfies the Appendix A minimum (5 defective + 5
-clean) and exceeds it by one defective class (all six classes named in the
-work plan are covered). No further defect classes are claimed.
+Scope of this record version: 6 planted defective cases (N=1 each:
+look-ahead leak, DST/timezone handling, backtest contamination, target
+leakage, cherry-picked metric, selection bias) and 5 clean cases (N=1 each:
+linear, scaled ridge, gradient boosting, timezone-aware hourly, scaled
+ElasticNet), plus the NC-NULL negative control (N=5). No further defect
+classes are claimed in this version.
 
 Audit-side ground truth used by the procedure (frozen here): feature
 availability at inference time for the synthetic energy domain is
