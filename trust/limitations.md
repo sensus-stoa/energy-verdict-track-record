@@ -15,13 +15,13 @@
 
 ## Scope of the set
 
-- This record version covers 6 defective + 5 clean cases. The Appendix A
-  minimum (5 defective + 5 clean) is satisfied; the sixth defective class
-  covers every defect class named in the work plan.
+- This record version covers 6 defective + 5 clean cases; the sixth defect
+  class extends the common 5+5 start set so that all six implemented
+  classes are covered.
 - Defect cases are single runs (N=1 each). Repetition across seeds/datasets
   is the next record version.
-- Until the record is human-signed and published, no paid Engineering
-  Verdict is offered (service brief, section 11).
+- The record carries machine verification only; the sign-off status is
+  stated in trust/verdict.json (an agent never signs).
 
 ## Data
 

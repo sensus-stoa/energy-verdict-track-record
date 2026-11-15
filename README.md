@@ -1,29 +1,37 @@
 # energy-verdict-track-record
 
-Verifier Track Record for the Engineering Verdict procedure, energy line
-(day-ahead load forecasting). This is the procedure self-test required
-before the first paid verdict: planted defective cases must be FAILed, clean
-cases must be PASSed, with sample sizes and uncertainty bounds stated next
-to every number.
+Open, deterministic test of the audit procedure used in the Engineering
+Verdict method for ML forecasting pipelines (energy domain). The record
+answers the question an evaluating engineer asks: what does this procedure
+catch, and what does it accuse without cause?
 
-Protocol: CV->0 Trust Layer v3.5. Live record: `trust/` (claims, evidence
-manifest, verdict, limitations). Reference record that established the
-format: permutation-test-ml (V-PTM-001).
+- 6 pipelines with planted defects the procedure must FAIL
+- 5 clean pipelines it must PASS
+- a negative control on destroyed-alignment data
+- sample sizes and uncertainty bounds next to every number
+
+Everything is reproducible: fixed seeds, committed data and results; the
+commands below regenerate every number byte-identically. Reference record
+that established the format: permutation-test-ml (V-PTM-001).
 
 ## Status
 
-Record version 3: the full defect-class battery (Appendix A minimum 5+5
-satisfied and exceeded by one defect class).
+- 6 defective cases (N=1 each), all FAIL: look-ahead leak (DATA),
+  DST/timezone handling (ENVIRONMENT), backtest contamination (DATA),
+  target leakage (DATA), cherry-picked metric (CONFLICT_EVIDENCE),
+  selection bias (NOISE)
+- 5 clean cases (N=1 each), all PASS: linear, scaled ridge, gradient
+  boosting, timezone-aware hourly, scaled ElasticNet
+- NC-NULL negative control (N=5): false PASS 0/5, Wilson 95% CI
+  [0.000, 0.434]
 
-- 6 defective cases (N=1 each): look-ahead leak (DATA), DST/timezone
-  handling (ENVIRONMENT), backtest contamination (DATA), target leakage
-  (DATA), cherry-picked metric (CONFLICT_EVIDENCE), selection bias (NOISE)
-- 5 clean cases (N=1 each): linear, scaled ridge, gradient boosting,
-  timezone-aware hourly, scaled ElasticNet
-- NC-NULL negative control (N=5)
+Summary: sensitivity 6/6 (N=6), Wilson 95% CI [0.610, 1.000]; specificity
+5/5 (N=5), Wilson 95% CI [0.566, 1.000]; false PASS on defective 0/6 (N=6),
+conservative rule-of-three upper bound about 50%.
 
-No paid verdicts are offered until this record is human-signed and
-published (service brief, section 11). See trust/limitations.md.
+The record files (criteria, evidence manifest with sha256, machine verdict,
+limitations) live in trust/. The machine verdict states the sign-off
+status; an agent never signs.
 
 ## Layout
 
@@ -37,8 +45,8 @@ published (service brief, section 11). See trust/limitations.md.
     src/run_track_record.py      runner: cases -> verdict -> results CSV
     src/pilot_calibration.py     pre-lock calibration (disclosed, not evidence)
     data/synthetic/              generated datasets (committed)
-    results/                     V-run outputs (committed, deterministic)
-    trust/                       the Trust Record
+    results/                     run outputs (committed, deterministic)
+    trust/                       the record
 
 ## How to run
 
@@ -77,9 +85,9 @@ below.
 
 Reason codes are the frozen CV0-TrustLayer-v3.5 vocabulary (9 values).
 
-## Results (record version 3)
+## Results
 
-Defective cases (N=1 each; all must be FAIL):
+Defective cases (N=1 each; all FAIL):
 
 | case | defect | verdict | reason | numbers |
 |---|---|---|---|---|
@@ -90,7 +98,7 @@ Defective cases (N=1 each; all must be FAIL):
 | defect_05_cherry_picked_metric | silent trim | FAIL | CONFLICT_EVIDENCE | reported MAE 996.5 MW (20 lowest-error days); recomputed full-window 1713.6 MW; diff 72.0% > 1% |
 | defect_06_selection_bias | best of K=20 on test | FAIL | NOISE | reported best-of-20 MAE 2607.8 MW > claim threshold 1880 MW; configurations carry no exogenous skill by construction |
 
-Clean cases (N=1 each; all must be PASS):
+Clean cases (N=1 each; all PASS):
 
 | case | model | data | verdict | MAE |
 |---|---|---|---|---|
@@ -103,13 +111,6 @@ Clean cases (N=1 each; all must be PASS):
 All clean cases beat their cadence-aware baselines on the same window
 (N=1 window each): daily persistence 2888 MW / seasonal-naive 3086 MW;
 hourly persistence (24h) 184 MW / seasonal-naive (168h) 136 MW.
-
-Summary (N is stated next to each number):
-
-- sensitivity (defective detected): 6/6 (N=6), Wilson 95% CI [0.610, 1.000]
-- specificity (clean passed): 5/5 (N=5), Wilson 95% CI [0.566, 1.000]
-- false PASS on defective: 0/6 (N=6); conservative rule-of-three upper
-  bound at 0/6 is about 50%
 
 NC-NULL control (clean pipeline re-run on block-permuted target data,
 7-day blocks, seeds 1..5; the procedure must not certify):
@@ -129,8 +130,9 @@ NC-NULL control (clean pipeline re-run on block-permuted target data,
 D1 (look-ahead leak): the pipeline trains and evaluates with realised
 weather (temp_actual) among its features. At inference time, a day-ahead
 forecast only has the temperature forecast (temp_forecast) available. The
-reported backtest MAE is not attainable in deployment. Mirrors section 2 of
-the service brief.
+reported backtest MAE is not attainable in deployment: the model
+involuntarily looks into the future; the evaluation, not the model, is
+defective.
 
 D2 (DST/timezone): an hourly pipeline converts to naive Berlin local wall
 time and computes "same hour yesterday" by wall-clock grouping. Across the
