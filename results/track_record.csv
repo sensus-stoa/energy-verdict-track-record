@@ -1,0 +1,3 @@
+case_id,is_defective,verdict_status,reason_code,false_pass,false_fail,notes
+defect_01_look_ahead,True,FAIL,DATA,0,0,backtest features include realised weather (temp_actual)
+clean_01_linear_forecast_features,False,PASS,,0,0,single pre-registered configuration (K=1)
