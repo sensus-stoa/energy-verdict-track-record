@@ -78,7 +78,7 @@ def load_or_generate(path: Path = DEFAULT_CSV) -> pd.DataFrame:
         return df
     df = generate_daily()
     path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(path)
+    df.to_csv(path, index_label="date")
     return df
 
 
@@ -94,7 +94,7 @@ def windows() -> dict:
 if __name__ == "__main__":
     df = generate_daily()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    df.to_csv(DEFAULT_CSV)
+    df.to_csv(DEFAULT_CSV, index_label="date")
     print(f"written {DEFAULT_CSV} rows={len(df)}")
     print(df.head(3))
     print(df.tail(3))
