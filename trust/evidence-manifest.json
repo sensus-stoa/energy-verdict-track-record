@@ -4,12 +4,12 @@
   "date": "2026-11-15",
   "object": {
     "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
-    "commit": "8b468e1992fe6d27ece0eedf973607dbf0d43fda"
+    "commit": "23c421dd7a25de4b7dac8ce361d3753b49e9afb4"
   },
   "criteria_lock": {
-    "commit": "97aab0a15fa550b0f78615fc73d54e41a63d1706",
+    "commit": "857cc60c03424fdfd9f6d06b434a90f772f857b4",
     "date": "2026-11-15",
-    "note": "Record version 3 lock: criteria C-01..C-07 text byte-identical to version 2 (lock 211909e2d81927de4211baa3a091db43c1fe2ea1; v1 lock e6a56ec4cc6dce81ae2da494b1ad96af87c3d834), new criteria C-08..C-12 appended, scope paragraph updated to the full defect-class battery (6 defective + 5 clean). All V-runs re-executed after this lock. Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001 and V-EVTR-002 remain in git history. NOTE: all commit hashes in this record were rewritten once before the first push (author-identity normalization, Evgeniy Dolgov / beattle1984@gmail.com); the criteria text is unchanged byte-for-byte (claims.md sha256 at lock: 092499e8451306e641c215eeeae2d90368bf66578e9ff2e63f1528fb4fc0f159), so pointers were re-locked without a re-run."
+    "note": "Record version 4 lock: criteria C-01..C-12 text byte-identical to version 3 (lock 97aab0a15fa550b0f78615fc73d54e41a63d1706; v2 lock 211909e2d81927de4211baa3a091db43c1fe2ea1; v1 lock e6a56ec4cc6dce81ae2da494b1ad96af87c3d834); editorial change limited to the scope paragraph (internal project references removed for external readers). All V-runs re-executed after this lock; every number reproduced byte-identically (sensitivity 6/6, specificity 5/5, NC-NULL 0/5). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001..003 remain in git history. NOTE: all commit hashes in this record were rewritten once before the first push (author-identity normalization, Evgeniy Dolgov / beattle1984@gmail.com); the criteria text is unchanged byte-for-byte (claims.md sha256 at lock: 092499e8451306e641c215eeeae2d90368bf66578e9ff2e63f1528fb4fc0f159), so pointers were re-locked without a re-run."
   },
   "evidence": [
     {"id": "E-01", "type": "code", "path": "src/verdict_procedure.py", "sha256": "c2e9a6ecadab35a6660e7362945e28f1e689e1e126444f5226887571e9d6bf88", "role": "author-generated", "disclosure": "public", "note": "Audit battery (8 audits incl. timezone integrity) and verdict logic; frozen reason codes; audit-side availability map"},
@@ -46,7 +46,7 @@
     {"id": "E-32", "type": "run-output", "path": "results/per_case/clean_03_gradient_boosting.json", "sha256": "523e20233581a9b6158e5aaef8aa63dd0e3ab40a074e4db25ed82587497598ed", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C3"},
     {"id": "E-33", "type": "run-output", "path": "results/per_case/clean_04_hourly_tz_aware.json", "sha256": "88a98ec5bb70db52b428fd98cb72db57f9a6a35c52b153cf4b48d97b300476fe", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C4"},
     {"id": "E-34", "type": "run-output", "path": "results/per_case/clean_05_elastic_net.json", "sha256": "f02affef9ab295cfa5a209e843eb8200190d98864fb1527d0ad671468e33dafa", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C5"},
-    {"id": "E-35", "type": "summary", "path": "README.md", "sha256": "de1a78e58b7b6b1a4730e4d3d89dc63947aec07a236de956a2ad5d5379d4f5ee", "role": "author-reported", "disclosure": "public", "note": "Description and results summary; regenerated from E-01..E-34"}
+    {"id": "E-35", "type": "summary", "path": "README.md", "sha256": "cd22602349f28f18e0b484f831907eb533d47197ea1760d72689d1ede07fd9b9", "role": "author-reported", "disclosure": "public", "note": "Description and results summary (editorial pass for external readers, internal project references removed); regenerated from E-01..E-34"}
   ],
   "controls": [
     {
