@@ -72,8 +72,8 @@
 
 ## Status of verification
 
-- The GitHub URL in the manifest is the publication target; the repository
-  push happens after the record files are committed.
+- Published at https://github.com/sensus-stoa/energy-verdict-track-record
+  (branch master); pushed after the record files were committed.
 - All runs are author-executed (via an automated agent session) and
   deterministic: daily seed 42, hourly seed 43, null-control seeds 1..5.
   Re-running the committed commands on the committed data must reproduce
