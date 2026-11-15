@@ -1,7 +1,12 @@
 case_id,is_defective,verdict_status,reason_code,false_pass,false_fail,notes
 defect_01_look_ahead,True,FAIL,DATA,0,0,backtest features include realised weather (temp_actual)
+defect_02_dst_timezone,True,FAIL,ENVIRONMENT,0,0,working frame on naive Berlin wall time; lags grouped by wall-clock hour
 defect_03_backtest_contamination,True,FAIL,DATA,0,0,train window overlaps the test window by 15 days (self-computed split)
 defect_04_target_leakage,True,FAIL,DATA,0,0,feature load_settlement = same-day realised load + reporting noise
+defect_05_cherry_picked_metric,True,FAIL,CONFLICT_EVIDENCE,0,0,reported MAE computed on the 20 lowest-error days of the 30-day window (silent trim)
+defect_06_selection_bias,True,FAIL,NOISE,0,0,best of K=20 configurations selected on the test window
 clean_01_linear_forecast_features,False,PASS,,0,0,single pre-registered configuration (K=1)
 clean_02_ridge_scaled,False,PASS,,0,0,"single pre-registered configuration (K=1), scaled Ridge"
 clean_03_gradient_boosting,False,PASS,,0,0,"single pre-registered configuration (K=1), gradient boosting"
+clean_04_hourly_tz_aware,False,PASS,,0,0,"single pre-registered configuration (K=1), UTC index preserved"
+clean_05_elastic_net,False,PASS,,0,0,"single pre-registered configuration (K=1), scaled ElasticNet"

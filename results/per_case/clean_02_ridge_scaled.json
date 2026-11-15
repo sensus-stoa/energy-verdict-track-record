@@ -31,6 +31,13 @@
         "metrics": {}
       },
       {
+        "name": "timezone_integrity",
+        "status": "ok",
+        "reason_code": "no duplicate/gap anomalies at daily cadence",
+        "detail": "",
+        "metrics": {}
+      },
+      {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
@@ -68,7 +75,11 @@
           "threshold_mae": 1879.5,
           "persistence_mae": 2887.5,
           "seasonal_naive_mae": 3086.3,
-          "mean_load_test_window": 53701.4
+          "mean_load_test_window": 53701.4,
+          "baseline_lags": [
+            1,
+            7
+          ]
         },
         "metrics": {}
       },
