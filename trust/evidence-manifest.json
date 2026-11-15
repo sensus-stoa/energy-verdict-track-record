@@ -4,12 +4,12 @@
   "date": "2026-11-15",
   "object": {
     "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
-    "commit": "23c421dd7a25de4b7dac8ce361d3753b49e9afb4"
+    "commit": "a7ef54814c060a46b2260d68c69760bf1506babb"
   },
   "criteria_lock": {
-    "commit": "857cc60c03424fdfd9f6d06b434a90f772f857b4",
+    "commit": "6858f2ee338c3714ded45ce9ec8f8cf1b7b1fef3",
     "date": "2026-11-15",
-    "note": "Record version 4 lock: criteria C-01..C-12 text byte-identical to version 3 (lock 97aab0a15fa550b0f78615fc73d54e41a63d1706; v2 lock 211909e2d81927de4211baa3a091db43c1fe2ea1; v1 lock e6a56ec4cc6dce81ae2da494b1ad96af87c3d834); editorial change limited to the scope paragraph (internal project references removed for external readers). All V-runs re-executed after this lock; every number reproduced byte-identically (sensitivity 6/6, specificity 5/5, NC-NULL 0/5). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001..003 remain in git history. NOTE: all commit hashes in this record were rewritten once before the first push (author-identity normalization, Evgeniy Dolgov / beattle1984@gmail.com); the criteria text is unchanged byte-for-byte (claims.md sha256 at lock: 092499e8451306e641c215eeeae2d90368bf66578e9ff2e63f1528fb4fc0f159), so pointers were re-locked without a re-run."
+    "note": "Record version 4 lock: criteria C-01..C-12 text byte-identical to version 3 (lock 4e9cb212cb3578249f5019b17662d0bac487e053; v2 lock a308fc369b8df4924b91526698903fe62b40b52b; v1 lock 64dc2a3b1fb1a84316a9435118e4607e24af33d6); editorial change limited to the scope paragraph (internal project references removed for external readers). All V-runs re-executed after this lock; every number reproduced byte-identically (sensitivity 6/6, specificity 5/5, NC-NULL 0/5). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001..003 remain in git history. NOTE: the branch was rewritten twice before publication, metadata only, file contents unchanged throughout: (1) author name normalization (Evgeniy Dolgov / beattle1984@gmail.com), (2) author email normalization to the sensus-stoa noreply address 284329574+sensus-stoa@users.noreply.github.com so GitHub attributes commits to sensus-stoa; personal and work emails were removed from public history at the same time. pointers were re-locked after each rewrite without a re-run (criteria text byte-for-byte unchanged; claims.md sha256 at lock: 092499e8451306e641c215eeeae2d90368bf66578e9ff2e63f1528fb4fc0f159)."
   },
   "evidence": [
     {"id": "E-01", "type": "code", "path": "src/verdict_procedure.py", "sha256": "c2e9a6ecadab35a6660e7362945e28f1e689e1e126444f5226887571e9d6bf88", "role": "author-generated", "disclosure": "public", "note": "Audit battery (8 audits incl. timezone integrity) and verdict logic; frozen reason codes; audit-side availability map"},

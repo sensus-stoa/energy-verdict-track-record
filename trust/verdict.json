@@ -3,7 +3,7 @@
   "verdict_id": "V-EVTR-004",
   "date": "2026-11-15",
   "valid_until": "object-change",
-  "object_version": "23c421dd7a25de4b7dac8ce361d3753b49e9afb4",
+  "object_version": "a7ef54814c060a46b2260d68c69760bf1506babb",
   "protocol_version": "CV0-TrustLayer-v3.5",
   "executor": "Automated agent session (Hermes, 2026-11-15) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
   "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-003, V-EVTR-002, V-EVTR-001; superseded verdicts remain in git history",
@@ -95,7 +95,7 @@
     }
   ],
   "properties_separate": {
-    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 23c421dd7a25de4b7dac8ce361d3753b49e9afb4; criteria locked at 857cc60c03424fdfd9f6d06b434a90f772f857b4 (C-01..C-12 text unchanged from v3 lock 97aab0a15fa550b0f78615fc73d54e41a63d1706; editorial scope-paragraph change only)",
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit a7ef54814c060a46b2260d68c69760bf1506babb; criteria locked at 6858f2ee338c3714ded45ce9ec8f8cf1b7b1fef3 (C-01..C-12 text unchanged from v3 lock 4e9cb212cb3578249f5019b17662d0bac487e053; editorial scope-paragraph change only; branch rewritten twice before publication for author-identity and email normalization, file contents unchanged)",
     "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
     "reproducibility": "V-01/V-02 deterministic (daily seed 42, hourly seed 43, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
     "validity": "Valid for the synthetic energy domains defined by src/data_generator.py (single city profile, daily and hourly, no holidays, no price effects). NOT evidence about real production pipelines. Start-set coverage: 6 defective + 5 clean cases across the daily and hourly synthetic domains"
