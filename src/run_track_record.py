@@ -66,7 +66,7 @@ def write_csv(path: Path, rows: list[dict]) -> None:
               "false_pass", "false_fail", "notes"]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
         w.writeheader()
         for r in rows:
             w.writerow(r)
@@ -132,7 +132,7 @@ def main() -> int:
                   f"{'/' + v['reason_code'] if v['reason_code'] else ''}"
                   f" mae_on_null={artifact.reported_mae:.1f}")
         with (RESULTS_DIR / "null_control.csv").open("w", newline="") as f:
-            wtr = csv.DictWriter(f, fieldnames=list(nc_rows[0]))
+            wtr = csv.DictWriter(f, fieldnames=list(nc_rows[0]), lineterminator="\n")
             wtr.writeheader()
             wtr.writerows(nc_rows)
         fp = sum(r["false_pass"] for r in nc_rows)
