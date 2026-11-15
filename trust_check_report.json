@@ -1,7 +1,7 @@
 {
   "tool": "trust_check",
   "version": "0.1.0",
-  "checked_at": "2026-11-15T10:02:26Z",
+  "checked_at": "2026-11-15T10:21:56Z",
   "root": "/home/ninjacat/Desktop/refusal/energy-verdict-track-record",
   "overall": "PASS",
   "claims": [
@@ -40,6 +40,31 @@
       "id": "C-07",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_03_gradient_boosting (N=1 clean case)"
+    },
+    {
+      "id": "C-08",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_02_dst_timezone (N=1 planted defective case, hourly data)"
+    },
+    {
+      "id": "C-09",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_04_hourly_tz_aware (N=1 clean case, hourly data)"
+    },
+    {
+      "id": "C-10",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_05_cherry_picked_metric (N=1 planted defective case)"
+    },
+    {
+      "id": "C-11",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_06_selection_bias (N=1 planted defective case, K=20 disclosed trial log)"
+    },
+    {
+      "id": "C-12",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_05_elastic_net (N=1 clean case)"
     }
   ],
   "checks": [
@@ -56,12 +81,12 @@
     {
       "id": "HASHES_MATCH",
       "status": "PASS",
-      "detail": "24 hashed artifacts verified"
+      "detail": "35 hashed artifacts verified"
     },
     {
       "id": "CLAIMS_XREF",
       "status": "PASS",
-      "detail": "all 7 claim ids present in claims.md"
+      "detail": "all 12 claim ids present in claims.md"
     },
     {
       "id": "EVIDENCE_XREF",
@@ -71,7 +96,7 @@
     {
       "id": "CONTROLS",
       "status": "PASS",
-      "detail": "controls sound for 7 PASS claims"
+      "detail": "controls sound for 12 PASS claims"
     },
     {
       "id": "REASON_CODES",
@@ -86,12 +111,12 @@
     {
       "id": "LOCK_BLOB",
       "status": "PASS",
-      "detail": "locked trust/claims.md non-empty (6467 bytes at 344f6dc8f365...)"
+      "detail": "locked trust/claims.md non-empty (10507 bytes at 8fd2947f9fbb...)"
     },
     {
       "id": "LOCK_ANCESTOR",
       "status": "PASS",
-      "detail": "344f6dc8f365... is an ancestor of HEAD"
+      "detail": "8fd2947f9fbb... is an ancestor of HEAD"
     }
   ]
 }
