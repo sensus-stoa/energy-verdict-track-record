@@ -4,230 +4,49 @@
   "date": "2026-11-15",
   "object": {
     "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
-    "commit": "5a3777a671c39d0f50583893d251d611eaa4e44a"
+    "commit": "e5f8239a7f2440e323f1be5670f328c0b5ba29b0"
   },
   "criteria_lock": {
-    "commit": "344f6dc8f36528a3c8f716f175306c0387644257",
+    "commit": "8fd2947f9fbb157c9bace6088d66f65b428a9582",
     "date": "2026-11-15",
-    "note": "Record version 2 lock: criteria C-01..C-03 text byte-identical to version 1 (lock dfff4a9f23300c31a5b62280b81950ae8f76005c), new criteria C-04..C-07 appended, scope paragraph updated to the 3+3 subset. All V-runs re-executed after this lock. Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdict V-EVTR-001 remains in git history."
+    "note": "Record version 3 lock: criteria C-01..C-07 text byte-identical to version 2 (lock 344f6dc8f36528a3c8f716f175306c0387644257; v1 lock dfff4a9f23300c31a5b62280b81950ae8f76005c), new criteria C-08..C-12 appended, scope paragraph updated to the full defect-class battery (6 defective + 5 clean). All V-runs re-executed after this lock. Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001 and V-EVTR-002 remain in git history."
   },
   "evidence": [
-    {
-      "id": "E-01",
-      "type": "code",
-      "path": "src/verdict_procedure.py",
-      "sha256": "f954453c0ef97c511fcfe593499f2fdac60367889b9fa88fd890be8e68229da3",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Audit battery (7 audits) and verdict logic; frozen reason-code vocabulary; audit-side feature availability map"
-    },
-    {
-      "id": "E-02",
-      "type": "code",
-      "path": "src/run_track_record.py",
-      "sha256": "c055f98cad6b684479f39880fab55daff03e093ea280f3f7470dfef1291e9f8a",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Runner: cases -> verdict procedure -> results CSVs + NC-NULL control loop"
-    },
-    {
-      "id": "E-03",
-      "type": "code",
-      "path": "src/case_api.py",
-      "sha256": "2b6d483bf9319324337c85d6784b55ecc411f2cddd5cab34d595705dbed49353",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Contract between a submitted case and the audit battery (incl. feature_frame_fn)"
-    },
-    {
-      "id": "E-04",
-      "type": "code",
-      "path": "src/metrics.py",
-      "sha256": "e3983d2c2f064898e1fff7d7ec51e899413a861438bd3f440598a3ff800d8675",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "MAE, persistence and seasonal-naive baselines, Wilson CI, block permutation surrogate"
-    },
-    {
-      "id": "E-05",
-      "type": "code",
-      "path": "src/linear_case.py",
-      "sha256": "00ac4e488c64466c1e42fe92d784f3a0e45e82561765cdc3af44d553b97abeb2",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Shared pipeline machinery (calendar + lag features, parameterised fit/eval)"
-    },
-    {
-      "id": "E-06",
-      "type": "code",
-      "path": "src/data_generator.py",
-      "sha256": "7a0dcb252f6ae69affd43e7b45f0e0a3193ede7330468f80706640ce002851c4",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Synthetic daily energy data generator, seed 42; defines audit-side feature availability semantics"
-    },
-    {
-      "id": "E-07",
-      "type": "code",
-      "path": "src/clean_cases/clean_pipeline_01.py",
-      "sha256": "f908fc9923592d5e11da86d1e5c84783e0504537db29c18e7a5679b4323dc756",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Clean case C1: deployment-consistent day-ahead linear forecast"
-    },
-    {
-      "id": "E-08",
-      "type": "code",
-      "path": "src/defects/look_ahead_leak.py",
-      "sha256": "fbea047fa5460825632332e9bed4470d3d23e69caa8ec0aa753403f6f28c8069",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Defective case D1: planted look-ahead leak; identical to C1 except the leak"
-    },
-    {
-      "id": "E-09",
-      "type": "code",
-      "path": "src/pilot_calibration.py",
-      "sha256": "5230d47d824f465a2c95385b23c1f8ed7a0f44ef2159fbb040bb5333a83c1c62",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Pre-lock calibration used to set claim thresholds before the criteria freeze; not evidence, disclosed for honesty"
-    },
-    {
-      "id": "E-10",
-      "type": "code",
-      "path": "src/defects/backtest_contamination.py",
-      "sha256": "4188c6750a223b2b8af2a7db32c598e1b1de58c0efebb02ec05af88a6202adb6",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Defective case D3: planted backtest contamination (train window overlaps test by 15 days)"
-    },
-    {
-      "id": "E-11",
-      "type": "code",
-      "path": "src/defects/target_leakage.py",
-      "sha256": "c5a8ff79f887183ce32fd50a0866ac413cbfccf92bed7febe9101a2c2dd24aaa",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Defective case D4: planted target leakage (load_settlement = same-day realised load + reporting noise)"
-    },
-    {
-      "id": "E-12",
-      "type": "code",
-      "path": "src/clean_cases/clean_pipeline_02.py",
-      "sha256": "d4c19ab0315dce608088671e4cd2351a491d303b942450c916e346436adfc0df",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Clean case C2: scaled Ridge pipeline"
-    },
-    {
-      "id": "E-13",
-      "type": "code",
-      "path": "src/clean_cases/clean_pipeline_03.py",
-      "sha256": "4f85d34cecc2bf71754ceab07fe34ddb63008f96552461de44fe3465403e1d8b",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Clean case C3: gradient boosting pipeline (random_state=42)"
-    },
-    {
-      "id": "E-14",
-      "type": "dependencies",
-      "path": "requirements.txt",
-      "sha256": "c4eaac91ff312d25272c76a3200f71fa272336acfd9860e94b1f5debf8f0a4c5",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1 (Python 3.11)"
-    },
-    {
-      "id": "E-15",
-      "type": "dataset",
-      "path": "data/synthetic/energy_daily.csv",
-      "sha256": "032a14ceb78edca2a478ead2ce4eaeca371e1d8355eb7bf0ad0c298ff3939e25",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "425 days, seed 42; train [0,335), test [335,365), confirmation [365,425)"
-    },
-    {
-      "id": "E-16",
-      "type": "run-output",
-      "path": "results/track_record.csv",
-      "sha256": "01ed46cdd7cd2340f5d7d43f226a63254b442a0e6cb0aa667c7ab1e6b85e1d70",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "V-01 output: one row per case (N=1 each); regenerable byte-identically from E-01..E-13 + E-15"
-    },
-    {
-      "id": "E-17",
-      "type": "run-output",
-      "path": "results/null_control.csv",
-      "sha256": "e50d78dc9114b18039a2c150aaa2f82031cc4ee2db52e84a70e15c75af43945e",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "V-02 output: NC-NULL, N=5 block-permutation runs (seeds 1..5)"
-    },
-    {
-      "id": "E-18",
-      "type": "run-output",
-      "path": "results/per_case/defect_01_look_ahead.json",
-      "sha256": "cb2dd71a751ddd72d2673ec2bd1033a2dc74b80140d5286743d3e860ee75ac99",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case D1"
-    },
-    {
-      "id": "E-19",
-      "type": "run-output",
-      "path": "results/per_case/defect_03_backtest_contamination.json",
-      "sha256": "541084fe57b71d25ef16a3e11d9ceef13d7a33e278d7da8f9a311b42b27afa78",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case D3"
-    },
-    {
-      "id": "E-20",
-      "type": "run-output",
-      "path": "results/per_case/defect_04_target_leakage.json",
-      "sha256": "5ab5dc5c8e09027ec9db7a803fd72f53c0548fac1d4abbfb344e2b65cf831766",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case D4"
-    },
-    {
-      "id": "E-21",
-      "type": "run-output",
-      "path": "results/per_case/clean_01_linear_forecast_features.json",
-      "sha256": "c2cec0788f26654642889a2dce5cefefc7e4ed8525e853bc92d6ba95c0caeb30",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case C1"
-    },
-    {
-      "id": "E-22",
-      "type": "run-output",
-      "path": "results/per_case/clean_02_ridge_scaled.json",
-      "sha256": "5267476fe8fecaae253206c8e16750c0e3ae8cc32cc8f178659156eeea9d96e8",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case C2"
-    },
-    {
-      "id": "E-23",
-      "type": "run-output",
-      "path": "results/per_case/clean_03_gradient_boosting.json",
-      "sha256": "3b79b96f70dd73dfd50df24fc7951349a75a1b35a5b140d9f89e249636b0daa8",
-      "role": "author-executed",
-      "disclosure": "public",
-      "note": "Full audit detail for case C3"
-    },
-    {
-      "id": "E-24",
-      "type": "summary",
-      "path": "README.md",
-      "sha256": "8ecaf2d8feeb70726c80705ec49009c717511028ce8e68340c4ea94b3f894215",
-      "role": "author-reported",
-      "disclosure": "public",
-      "note": "Description and results summary; regenerated from E-01..E-23"
-    }
+    {"id": "E-01", "type": "code", "path": "src/verdict_procedure.py", "sha256": "c2e9a6ecadab35a6660e7362945e28f1e689e1e126444f5226887571e9d6bf88", "role": "author-generated", "disclosure": "public", "note": "Audit battery (8 audits incl. timezone integrity) and verdict logic; frozen reason codes; audit-side availability map"},
+    {"id": "E-02", "type": "code", "path": "src/run_track_record.py", "sha256": "36e42d9a6dcc8858445572706211240fe42d36a23af25f6b5c9febecfea7c5af", "role": "author-generated", "disclosure": "public", "note": "Runner: per-case dataset dispatch, cases -> verdict -> results CSVs + NC-NULL loop"},
+    {"id": "E-03", "type": "code", "path": "src/case_api.py", "sha256": "2b6d483bf9319324337c85d6784b55ecc411f2cddd5cab34d595705dbed49353", "role": "author-generated", "disclosure": "public", "note": "Contract between a submitted case and the audit battery (incl. feature_frame_fn)"},
+    {"id": "E-04", "type": "code", "path": "src/metrics.py", "sha256": "8bd358c6c35ec4b5d8d21900a45de631f2e6bc9d9cc04e20385e8d56a9cc3b0e", "role": "author-generated", "disclosure": "public", "note": "MAE, cadence-aware baselines (lag 1/7 daily, 24/168 hourly), Wilson CI, block permutation surrogate"},
+    {"id": "E-05", "type": "code", "path": "src/linear_case.py", "sha256": "00ac4e488c64466c1e42fe92d784f3a0e45e82561765cdc3af44d553b97abeb2", "role": "author-generated", "disclosure": "public", "note": "Shared pipeline machinery (calendar + lag features, parameterised fit/eval)"},
+    {"id": "E-06", "type": "code", "path": "src/data_generator.py", "sha256": "6d9199d6ca80a6fb4e1e97987f67f60a1fde6414abbb6883798753789c990e18", "role": "author-generated", "disclosure": "public", "note": "Synthetic daily (seed 42) and hourly (seed 43, naive UTC) generators; define audit-side availability semantics"},
+    {"id": "E-07", "type": "code", "path": "src/clean_cases/clean_pipeline_01.py", "sha256": "f908fc9923592d5e11da86d1e5c84783e0504537db29c18e7a5679b4323dc756", "role": "author-generated", "disclosure": "public", "note": "Clean case C1: deployment-consistent day-ahead linear forecast"},
+    {"id": "E-08", "type": "code", "path": "src/defects/look_ahead_leak.py", "sha256": "fbea047fa5460825632332e9bed4470d3d23e69caa8ec0aa753403f6f28c8069", "role": "author-generated", "disclosure": "public", "note": "Defective case D1: planted look-ahead leak; identical to C1 except the leak"},
+    {"id": "E-09", "type": "code", "path": "src/pilot_calibration.py", "sha256": "a7c34f81308d7af9e34ee390325d40505201e3ce8ba36d11d3451089d53bdc13", "role": "author-generated", "disclosure": "public", "note": "Pre-lock calibration; not evidence, disclosed for honesty"},
+    {"id": "E-10", "type": "code", "path": "src/defects/backtest_contamination.py", "sha256": "4188c6750a223b2b8af2a7db32c598e1b1de58c0efebb02ec05af88a6202adb6", "role": "author-generated", "disclosure": "public", "note": "Defective case D3: planted backtest contamination (train overlaps test by 15 days)"},
+    {"id": "E-11", "type": "code", "path": "src/defects/target_leakage.py", "sha256": "c5a8ff79f887183ce32fd50a0866ac413cbfccf92bed7febe9101a2c2dd24aaa", "role": "author-generated", "disclosure": "public", "note": "Defective case D4: planted target leakage (load_settlement near-copy)"},
+    {"id": "E-12", "type": "code", "path": "src/clean_cases/clean_pipeline_02.py", "sha256": "d4c19ab0315dce608088671e4cd2351a491d303b942450c916e346436adfc0df", "role": "author-generated", "disclosure": "public", "note": "Clean case C2: scaled Ridge pipeline"},
+    {"id": "E-13", "type": "code", "path": "src/clean_cases/clean_pipeline_03.py", "sha256": "4f85d34cecc2bf71754ceab07fe34ddb63008f96552461de44fe3465403e1d8b", "role": "author-generated", "disclosure": "public", "note": "Clean case C3: gradient boosting pipeline (random_state=42)"},
+    {"id": "E-14", "type": "code", "path": "src/defects/dst_timezone.py", "sha256": "24c824201cd8dab1e882ff9982057ba52d2f20be12ea630602359285149b9222", "role": "author-generated", "disclosure": "public", "note": "Defective case D2: naive Berlin wall-time working frame + wall-clock lag grouping (hourly)"},
+    {"id": "E-15", "type": "code", "path": "src/clean_cases/clean_pipeline_04_hourly.py", "sha256": "92bf6a1797c633ebc69649a99667a8f92bc052c79b42ee79a732ea5aedf8703c", "role": "author-generated", "disclosure": "public", "note": "Clean case C4: timezone-aware hourly pipeline (UTC index preserved), twin of D2"},
+    {"id": "E-16", "type": "code", "path": "src/defects/cherry_picked_metric.py", "sha256": "634e950c81623fb91570cc80d2d2bd60f22109cfbf9b0ab74d522dcdde7641c4", "role": "author-generated", "disclosure": "public", "note": "Defective case D5: reported MAE on the 20 lowest-error days (silent trim)"},
+    {"id": "E-17", "type": "code", "path": "src/defects/selection_bias.py", "sha256": "6d8c0eb5d0fcc16f15cfeb5d24d91645cb01f8b07189957ffcf6418102b27db7", "role": "author-generated", "disclosure": "public", "note": "Defective case D6: best of K=20 noise-configurations selected on the test window (disclosed trial log)"},
+    {"id": "E-18", "type": "code", "path": "src/clean_cases/clean_pipeline_05_elastic_net.py", "sha256": "cca43fe6905f11c6ddca74ac1fea6f4a3a5be7930ab4ec45a5fa0a44e3d1e38e", "role": "author-generated", "disclosure": "public", "note": "Clean case C5: scaled ElasticNet pipeline"},
+    {"id": "E-19", "type": "dependencies", "path": "requirements.txt", "sha256": "c4eaac91ff312d25272c76a3200f71fa272336acfd9860e94b1f5debf8f0a4c5", "role": "author-generated", "disclosure": "public", "note": "numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1 (Python 3.11)"},
+    {"id": "E-20", "type": "dataset", "path": "data/synthetic/energy_daily.csv", "sha256": "032a14ceb78edca2a478ead2ce4eaeca371e1d8355eb7bf0ad0c298ff3939e25", "role": "author-generated", "disclosure": "public", "note": "425 days, seed 42; train [0,335), test [335,365), confirmation [365,425)"},
+    {"id": "E-21", "type": "dataset", "path": "data/synthetic/energy_hourly.csv", "sha256": "4de9c7338021888d661a986e90d589cd3c7839f9120abff0ee3e0b50b3297457", "role": "author-generated", "disclosure": "public", "note": "8760 hours of 2023, seed 43, naive UTC index (semantics: UTC); contains both Europe/Berlin DST transitions"},
+    {"id": "E-22", "type": "run-output", "path": "results/track_record.csv", "sha256": "b8a2e3e77f859190aff1c7095035f93f82b14abdbd094c65a4d17c81cc213c98", "role": "author-executed", "disclosure": "public", "note": "V-01 output: one row per case (N=1 each); regenerable byte-identically from E-01..E-18 + E-20/E-21"},
+    {"id": "E-23", "type": "run-output", "path": "results/null_control.csv", "sha256": "e50d78dc9114b18039a2c150aaa2f82031cc4ee2db52e84a70e15c75af43945e", "role": "author-executed", "disclosure": "public", "note": "V-02 output: NC-NULL, N=5 block-permutation runs (seeds 1..5)"},
+    {"id": "E-24", "type": "run-output", "path": "results/per_case/defect_01_look_ahead.json", "sha256": "0c29befa4f5ff15b3bff7894402293a85504d9798c76b87d93ab4b57cb577da6", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D1"},
+    {"id": "E-25", "type": "run-output", "path": "results/per_case/defect_02_dst_timezone.json", "sha256": "f0597b35ee77bfd6e6d43b7e562e07bf3908ca98141023342b6f0666d93ee40f", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D2"},
+    {"id": "E-26", "type": "run-output", "path": "results/per_case/defect_03_backtest_contamination.json", "sha256": "10a95e1d04081fd4e1177896a150756d303dd010d9ce4038e8198a92bffd502c", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D3"},
+    {"id": "E-27", "type": "run-output", "path": "results/per_case/defect_04_target_leakage.json", "sha256": "aa3e9dbc7c42c73d0d275ce420142386fdfab5aec867ada1eced3bbe1e7d674e", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D4"},
+    {"id": "E-28", "type": "run-output", "path": "results/per_case/defect_05_cherry_picked_metric.json", "sha256": "bc1eb694b8f5ac6054449eea406a99f93393e0d3ad1f776f8386beeb831efba4", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D5"},
+    {"id": "E-29", "type": "run-output", "path": "results/per_case/defect_06_selection_bias.json", "sha256": "11d7b76ec638f5dde111f11fa68db025f066dd81f7fe2284247210671f39aff2", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D6"},
+    {"id": "E-30", "type": "run-output", "path": "results/per_case/clean_01_linear_forecast_features.json", "sha256": "030e669fc26538d3c7a9924d110973507108eae03de56cb980e6a563909a49e3", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C1"},
+    {"id": "E-31", "type": "run-output", "path": "results/per_case/clean_02_ridge_scaled.json", "sha256": "137f38ee4022d4bd4e86bd1557e41f7e7f51ab591324d190ab30079d4e2b4b07", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C2"},
+    {"id": "E-32", "type": "run-output", "path": "results/per_case/clean_03_gradient_boosting.json", "sha256": "523e20233581a9b6158e5aaef8aa63dd0e3ab40a074e4db25ed82587497598ed", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C3"},
+    {"id": "E-33", "type": "run-output", "path": "results/per_case/clean_04_hourly_tz_aware.json", "sha256": "88a98ec5bb70db52b428fd98cb72db57f9a6a35c52b153cf4b48d97b300476fe", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C4"},
+    {"id": "E-34", "type": "run-output", "path": "results/per_case/clean_05_elastic_net.json", "sha256": "f02affef9ab295cfa5a209e843eb8200190d98864fb1527d0ad671468e33dafa", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C5"},
+    {"id": "E-35", "type": "summary", "path": "README.md", "sha256": "de1a78e58b7b6b1a4730e4d3d89dc63947aec07a236de956a2ad5d5379d4f5ee", "role": "author-reported", "disclosure": "public", "note": "Description and results summary; regenerated from E-01..E-34"}
   ],
   "controls": [
     {
@@ -241,7 +60,7 @@
     }
   ],
   "disclosure_levels": {
-    "public": "Open repository (to be pushed), code, synthetic data, results, record files",
+    "public": "Open repository, code, synthetic data, results, record files",
     "client": null,
     "sealed": null
   }
