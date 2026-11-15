@@ -1,0 +1,77 @@
+{
+  "tool": "trust_check",
+  "version": "0.1.0",
+  "checked_at": "2026-11-15T09:53:05Z",
+  "root": "/home/ninjacat/Desktop/refusal/energy-verdict-track-record",
+  "overall": "PASS",
+  "claims": [
+    {
+      "id": "C-01",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_01_look_ahead (N=1 planted defective case)"
+    },
+    {
+      "id": "C-02",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_01_linear_forecast_features (N=1 clean case)"
+    },
+    {
+      "id": "C-03",
+      "status": "PASS",
+      "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)",
+      "control": "NC-NULL"
+    }
+  ],
+  "checks": [
+    {
+      "id": "FILES_PRESENT",
+      "status": "PASS",
+      "detail": "all 4 record files present and non-empty"
+    },
+    {
+      "id": "JSON_VALID",
+      "status": "PASS",
+      "detail": "manifest and verdict parse; structure complete"
+    },
+    {
+      "id": "HASHES_MATCH",
+      "status": "PASS",
+      "detail": "16 hashed artifacts verified"
+    },
+    {
+      "id": "CLAIMS_XREF",
+      "status": "PASS",
+      "detail": "all 3 claim ids present in claims.md"
+    },
+    {
+      "id": "EVIDENCE_XREF",
+      "status": "PASS",
+      "detail": "all evidence references resolve to manifest entries"
+    },
+    {
+      "id": "CONTROLS",
+      "status": "PASS",
+      "detail": "controls sound for 3 PASS claims"
+    },
+    {
+      "id": "REASON_CODES",
+      "status": "PASS",
+      "detail": "every non-PASS claim carries a reason_code"
+    },
+    {
+      "id": "VALID_UNTIL",
+      "status": "PASS",
+      "detail": "valid_until: object-change"
+    },
+    {
+      "id": "LOCK_BLOB",
+      "status": "PASS",
+      "detail": "locked trust/claims.md non-empty (3864 bytes at dfff4a9f2330...)"
+    },
+    {
+      "id": "LOCK_ANCESTOR",
+      "status": "PASS",
+      "detail": "dfff4a9f2330... is an ancestor of HEAD"
+    }
+  ]
+}

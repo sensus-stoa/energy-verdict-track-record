@@ -30,7 +30,11 @@ PER_CASE_DIR = RESULTS_DIR / "per_case"
 
 REGISTRY = {
     "defect_01_look_ahead": ("src.defects.look_ahead_leak", True),
+    "defect_03_backtest_contamination": ("src.defects.backtest_contamination", True),
+    "defect_04_target_leakage": ("src.defects.target_leakage", True),
     "clean_01_linear_forecast_features": ("src.clean_cases.clean_pipeline_01", False),
+    "clean_02_ridge_scaled": ("src.clean_cases.clean_pipeline_02", False),
+    "clean_03_gradient_boosting": ("src.clean_cases.clean_pipeline_03", False),
 }
 
 NULL_CONTROL_ID = "NC-NULL"

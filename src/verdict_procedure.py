@@ -146,11 +146,12 @@ def audit_deployment_consistency(data, art: CaseArtifact, cfg: AuditConfig) -> A
 def audit_feature_target_proximity(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
     ev = _sel(data, art.windows.test)
     y = ev["load"]
+    feat_df = art.feature_frame_fn(data)
     suspects = []
     for f in art.feature_names_used:
-        if f not in data.columns:
+        if f not in feat_df.columns:
             continue
-        x = _sel(data, art.windows.test)[f]
+        x = _sel(feat_df, art.windows.test)[f]
         ok = x.notna() & y.notna()
         if ok.sum() < 10:
             continue
@@ -279,8 +280,8 @@ def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
 AUDITS = (
     audit_prediction_alignment,
     audit_train_test_isolation,
-    audit_deployment_consistency,
     audit_feature_target_proximity,
+    audit_deployment_consistency,
     audit_metric_reproduction,
     audit_claim_conditions,
     audit_trial_disclosure,

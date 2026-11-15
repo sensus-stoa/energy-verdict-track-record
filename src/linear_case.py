@@ -23,11 +23,13 @@ def add_case_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def fit_eval(feat_df: pd.DataFrame, features: list[str],
              train_w: tuple[str, str], eval_w: tuple[str, str],
-             target: str = "load"):
+             target: str = "load", model=None):
     tr = feat_df[(feat_df.index >= train_w[0]) & (feat_df.index < train_w[1])]
     tr = tr.dropna(subset=list(features) + [target])   # lag features are NaN at series head
     ev = feat_df[(feat_df.index >= eval_w[0]) & (feat_df.index < eval_w[1])]
-    model = LinearRegression().fit(tr[features], tr[target])
+    if model is None:
+        model = LinearRegression()
+    model.fit(tr[features], tr[target])
     preds = pd.Series(model.predict(ev[features]), index=ev.index, name="pred")
     m = mae(ev[target], preds)
     return model, preds, m

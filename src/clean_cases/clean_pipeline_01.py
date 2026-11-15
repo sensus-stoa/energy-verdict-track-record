@@ -48,6 +48,7 @@ def run(data: pd.DataFrame, windows: Windows) -> CaseArtifact:
         windows=windows,
         model=model,
         feature_names_used=list(model.feature_names_in_),
+        feature_frame_fn=build_features,
         retrain_eval_fn=retrain_eval,
         trial_log=[{"config_id": "default", "features": list(FEATURES), "test_mae": m}],
         notes="single pre-registered configuration (K=1)",

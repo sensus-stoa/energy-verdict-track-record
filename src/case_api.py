@@ -52,6 +52,8 @@ class CaseArtifact:
     windows: Windows
     model: object                              # fitted sklearn model
     feature_names_used: list[str]              # from model.feature_names_in_
+    feature_frame_fn: Callable[[pd.DataFrame], pd.DataFrame]  # case's own builder;
+        # the audit re-executes it on raw data to inspect derived features
     retrain_eval_fn: Callable[[pd.DataFrame, list[str], tuple[str, str], tuple[str, str]],
                               tuple[pd.Series, float]]
     trial_log: list[dict] = field(default_factory=list)  # configs tried on test window

@@ -9,10 +9,12 @@ trust/evidence-manifest.json (criteria_lock). Any change to these criteria
 after the lock commit is a new version marked post-hoc and requires a
 re-run for PASS.
 
-Scope of this record version: the MVP subset of the Appendix A start set.
-Covered: 1 planted defective case (N=1), 1 clean case (N=1), and the NC-NULL
-negative control (N=5). The remaining cases of the full 5 defective + 5 clean
-set are not implemented yet; no claim is made about them. A new record
+Scope of this record version: 3 planted defective cases (N=1 each: look-ahead
+leak, backtest contamination, target leakage), 3 clean cases (N=1 each:
+linear, scaled ridge, gradient boosting), and the NC-NULL negative control
+(N=5). This is the 3+3 subset of the Appendix A start set (5 defective +
+5 clean). DST/timezone handling, cherry-picked metrics and selection bias
+cases are not implemented yet; no claim is made about them. A new record
 version will extend the set.
 
 Audit-side ground truth used by the procedure (frozen here): feature
@@ -64,3 +66,47 @@ C-04). Block permutation is used ONLY as a negative control on deliberately
 destroyed data, never as a significance test on real data.
 PASS criterion: false PASS = 0 in N = 5 runs.
 Verification V-02: python -m src.run_track_record --cases all --with-null-control
+
+## C-04 Procedure detects backtest contamination
+Claim: the verdict procedure FAILs a pipeline whose train window overlaps
+the test window (15 days of overlap from a self-computed split).
+Case: defect_03_backtest_contamination (N=1 planted defective case).
+PASS criterion: verdict = FAIL with reason_code = DATA; the train/test
+isolation audit flags the window overlap.
+Reference values from the committed run: reported MAE 1604.9 MW on a
+contaminated backtest.
+Verification V-01: python -m src.run_track_record --case defect_03_backtest_contamination
+
+## C-05 Procedure detects target leakage
+Claim: the verdict procedure FAILs a pipeline whose feature table contains
+a near-copy of the target (load_settlement = same-day realised load plus
+reporting noise, |corr| with the target above 0.995).
+Case: defect_04_target_leakage (N=1 planted defective case).
+PASS criterion: verdict = FAIL with reason_code = DATA; the proximity audit
+flags the suspect feature and the drop-test (retrain without it) grows the
+MAE at least 2x against the reported number.
+Reference values from the committed run: reported MAE 126.0 MW; corr 0.999;
+MAE without the suspect feature 1713.6 MW (collapse ratio 13.6).
+Verification V-01: python -m src.run_track_record --case defect_04_target_leakage
+
+## C-06 Procedure passes a regularised linear pipeline
+Claim: the verdict procedure PASSes a clean scaled-Ridge pipeline (different
+model family from C-02, same deployment-consistent features) under the same
+claim conditions.
+Case: clean_02_ridge_scaled (N=1 clean case).
+PASS criterion: verdict = PASS with all audits ok; recomputed MAE matches
+reported within 1%; claim holds (MAE <= 3.5% of mean load; better than
+persistence and seasonal-naive).
+Reference values from the committed run: MAE 1714.3 MW = 3.19% of mean load.
+Verification V-01: python -m src.run_track_record --cases all
+
+## C-07 Procedure passes a gradient boosting pipeline
+Claim: the verdict procedure PASSes a clean gradient boosting pipeline
+(nonlinear family, fixed hyperparameters, single configuration) under the
+same claim conditions.
+Case: clean_03_gradient_boosting (N=1 clean case).
+PASS criterion: verdict = PASS with all audits ok; recomputed MAE matches
+reported within 1%; claim holds (MAE <= 3.5% of mean load; better than
+persistence and seasonal-naive).
+Reference values from the committed run: MAE 1286.3 MW = 2.40% of mean load.
+Verification V-01: python -m src.run_track_record --cases all
