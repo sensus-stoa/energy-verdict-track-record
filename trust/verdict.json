@@ -1,0 +1,50 @@
+{
+  "schema": "trust-verdict/v3.5",
+  "verdict_id": "V-EVTR-001",
+  "date": "2026-11-15",
+  "valid_until": "object-change",
+  "object_version": "5be918fda40c19e820f61a52e866c0818a961c2d",
+  "protocol_version": "CV0-TrustLayer-v3.5",
+  "executor": "Automated agent session (Hermes, 2026-11-15) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
+  "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent",
+  "claims": [
+    {
+      "id": "C-01",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_01_look_ahead (N=1 planted defective case)",
+      "evidence": ["E-01", "E-02", "E-08", "E-12", "E-14"],
+      "note": "Verdict FAIL, reason_code DATA. Structural: fitted model uses temp_actual, unavailable at inference. Deployment re-run MAE 1713.6 MW vs reported 1387.4 MW, relative gap 23.5% > 20% threshold"
+    },
+    {
+      "id": "C-02",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_01_linear_forecast_features (N=1 clean case)",
+      "evidence": ["E-01", "E-02", "E-07", "E-12", "E-15"],
+      "note": "Verdict PASS, all 7 audits ok. Recomputed MAE equals reported (1713.6 MW, diff 0.0). Claim holds: 3.19% of mean load 53701 MW <= 3.5%; beats persistence 2888 MW and seasonal-naive 3086 MW on the same 30-day window (N=1 window)"
+    },
+    {
+      "id": "C-03",
+      "status": "PASS",
+      "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)",
+      "evidence": ["E-01", "E-02", "E-06", "E-13"],
+      "control": "NC-NULL",
+      "note": "False PASS 0/5 (N=5). Wilson 95% CI [0.000, 0.434]; conservative rule-of-three upper bound ~60%, stated next to the zero. MAE on null data 2318.2-2960.6 MW, all above the claim threshold 1879.5 MW"
+    }
+  ],
+  "properties_separate": {
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 5be918fda40c19e820f61a52e866c0818a961c2d; criteria locked at dfff4a9f23300c31a5b62280b81950ae8f76005c",
+    "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
+    "reproducibility": "V-01/V-02 deterministic (data seed 42, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
+    "validity": "Valid for the synthetic daily energy domain defined by src/data_generator.py (single city profile, no holidays, no hourly structure). NOT evidence about real production pipelines. The full Appendix A set (5 defective + 5 clean) is not implemented in this record version"
+  },
+  "negative_controls": [
+    {
+      "id": "NC-NULL",
+      "N": 5,
+      "rejections": 0,
+      "rate": 0.0,
+      "wilson_ci_95": [0.0, 0.434],
+      "note": "rejections = false PASS on destroyed-alignment data; zero published with Wilson CI and rule-of-three bound (~60%); naive point-shuffle not used (V-PTM-001 C-04)"
+    }
+  ]
+}

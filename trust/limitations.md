@@ -54,6 +54,8 @@
 
 ## Status of verification
 
+- The GitHub URL in the manifest is the intended publication target; the
+  repository has not been pushed yet at the time of this record version.
 - All runs are author-executed (via an automated agent session) and
   deterministic: data seed 42, null-control seeds 1..5. Re-running the
   committed commands on the committed data must reproduce every number.

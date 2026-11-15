@@ -1,0 +1,176 @@
+{
+  "schema": "trust-manifest/v3.5",
+  "protocol_version": "CV0-TrustLayer-v3.5",
+  "date": "2026-11-15",
+  "object": {
+    "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
+    "commit": "5be918fda40c19e820f61a52e866c0818a961c2d"
+  },
+  "criteria_lock": {
+    "commit": "dfff4a9f23300c31a5b62280b81950ae8f76005c",
+    "date": "2026-11-15",
+    "note": "Criteria C-01..C-03 fixed in trust/claims.md at this commit (the criteria text and the initial code share the lock commit; no V-run happened before the lock; the pre-lock pilot run is disclosed as E-09 and is not evidence). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. sha256 of trust/claims.md at the lock commit: aa55c17c33c03d994cd5d80a57b961543392b6a21fea9026b63dd01e5192ba5b."
+  },
+  "evidence": [
+    {
+      "id": "E-01",
+      "type": "code",
+      "path": "src/verdict_procedure.py",
+      "sha256": "e016ed7cf961fb3df48484e9e8556828c2cf9a804c7f922c09c6abb13750cf5f",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Audit battery (7 audits) and verdict logic; frozen reason-code vocabulary; audit-side feature availability map"
+    },
+    {
+      "id": "E-02",
+      "type": "code",
+      "path": "src/run_track_record.py",
+      "sha256": "372ee98afc5dc6b998d1f1819cfef1d0eb07dbc4e5abea3589296f882a5eeb8d",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Runner: cases -> verdict procedure -> results CSVs + NC-NULL control loop"
+    },
+    {
+      "id": "E-03",
+      "type": "code",
+      "path": "src/case_api.py",
+      "sha256": "fe22a06affa58fe69d625ba5a3790b4b18d1e2a8bc6f8f436d3c3653ecfbe30d",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Contract between a submitted case and the audit battery"
+    },
+    {
+      "id": "E-04",
+      "type": "code",
+      "path": "src/metrics.py",
+      "sha256": "e3983d2c2f064898e1fff7d7ec51e899413a861438bd3f440598a3ff800d8675",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "MAE, persistence and seasonal-naive baselines, Wilson CI, block permutation surrogate"
+    },
+    {
+      "id": "E-05",
+      "type": "code",
+      "path": "src/linear_case.py",
+      "sha256": "15d7b119c884fe60774feeea3b7a5eacac880681f921c336c4d0e6c5f714fd70",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Shared linear pipeline machinery (calendar + lag features, fit/eval)"
+    },
+    {
+      "id": "E-06",
+      "type": "code",
+      "path": "src/data_generator.py",
+      "sha256": "7a0dcb252f6ae69affd43e7b45f0e0a3193ede7330468f80706640ce002851c4",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Synthetic daily energy data generator, seed 42; defines audit-side feature availability semantics"
+    },
+    {
+      "id": "E-07",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_01.py",
+      "sha256": "33134add74aa4818f5bb7d0e731949bfe1a14a4e578d8513ba29963eb6607e5e",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C1: deployment-consistent day-ahead linear forecast"
+    },
+    {
+      "id": "E-08",
+      "type": "code",
+      "path": "src/defects/look_ahead_leak.py",
+      "sha256": "db16f096e0c27761e910b1799ace120ac94f50d07a976e8833c885dedebb8562",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D1: planted look-ahead leak (realised weather in backtest features); identical to C1 except the leak"
+    },
+    {
+      "id": "E-09",
+      "type": "code",
+      "path": "src/pilot_calibration.py",
+      "sha256": "4a6abe3fb648ccc9349e5c07920a89e66b92a9373a511cc1e2ff2ee3cfbd36a7",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Pre-lock calibration used to set claim thresholds before the criteria freeze; not evidence, disclosed for honesty"
+    },
+    {
+      "id": "E-10",
+      "type": "dependencies",
+      "path": "requirements.txt",
+      "sha256": "c4eaac91ff312d25272c76a3200f71fa272336acfd9860e94b1f5debf8f0a4c5",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1 (Python 3.11)"
+    },
+    {
+      "id": "E-11",
+      "type": "dataset",
+      "path": "data/synthetic/energy_daily.csv",
+      "sha256": "032a14ceb78edca2a478ead2ce4eaeca371e1d8355eb7bf0ad0c298ff3939e25",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "425 days, seed 42; train [0,335), test [335,365), confirmation [365,425)"
+    },
+    {
+      "id": "E-12",
+      "type": "run-output",
+      "path": "results/track_record.csv",
+      "sha256": "12319781983697d011bfd509df49b9c1b104d38a646f4f489764768c01713dbb",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "V-01 output: one row per case (N=1 each); regenerable byte-identically from E-01..E-08 + E-11"
+    },
+    {
+      "id": "E-13",
+      "type": "run-output",
+      "path": "results/null_control.csv",
+      "sha256": "e50d78dc9114b18039a2c150aaa2f82031cc4ee2db52e84a70e15c75af43945e",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "V-02 output: NC-NULL, N=5 block-permutation runs (seeds 1..5)"
+    },
+    {
+      "id": "E-14",
+      "type": "run-output",
+      "path": "results/per_case/defect_01_look_ahead.json",
+      "sha256": "e0906678a74ed936528276a7e93fb1e40a4d25349f4baeab4d8807b9d6cc60a0",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail for case D1"
+    },
+    {
+      "id": "E-15",
+      "type": "run-output",
+      "path": "results/per_case/clean_01_linear_forecast_features.json",
+      "sha256": "7e73ad9ab141cc037329a6b280770c301f91ef2b12543dfa4e50730add59cf48",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail for case C1"
+    },
+    {
+      "id": "E-16",
+      "type": "summary",
+      "path": "README.md",
+      "sha256": "721b2459715644c588f82e5b9620dac9d32b752a41ee809a6ba22bfa3037bb8d",
+      "role": "author-reported",
+      "disclosure": "public",
+      "note": "Description and results summary; regenerated from E-01..E-15"
+    }
+  ],
+  "controls": [
+    {
+      "id": "NC-NULL",
+      "description": "Block permutation of the target series (7-day blocks, seeds 1..5): alignment between target and all exogenous/calendar features is destroyed; the clean pipeline is rebuilt and re-run on the permuted data; the verdict procedure must not issue PASS",
+      "N": 5,
+      "rejections": 0,
+      "rate": 0.0,
+      "wilson_ci_95": [0.0, 0.434],
+      "note": "rejections = false PASS on null data. Zero is published together with the Wilson CI and the conservative rule-of-three upper bound (~60% at 0/5). Naive point-shuffle of labels is not used (invalid on trended data; measured in V-PTM-001 claim C-04)"
+    }
+  ],
+  "disclosure_levels": {
+    "public": "Open repository (to be pushed), code, synthetic data, results, record files",
+    "client": null,
+    "sealed": null
+  }
+}
