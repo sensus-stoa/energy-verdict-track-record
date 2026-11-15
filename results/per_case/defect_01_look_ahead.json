@@ -31,6 +31,15 @@
         "metrics": {}
       },
       {
+        "name": "feature_target_proximity",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "",
+        "metrics": {
+          "suspects": []
+        }
+      },
+      {
         "name": "deployment_consistency",
         "status": "fail",
         "reason_code": "DATA",
@@ -41,15 +50,6 @@
           ],
           "deployment_mae": 1713.6,
           "relative_gap": 0.235
-        }
-      },
-      {
-        "name": "feature_target_proximity",
-        "status": "ok",
-        "reason_code": "",
-        "detail": "",
-        "metrics": {
-          "suspects": []
         }
       },
       {

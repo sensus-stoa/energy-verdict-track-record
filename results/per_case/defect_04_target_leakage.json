@@ -1,0 +1,91 @@
+{
+  "case_id": "defect_04_target_leakage",
+  "is_defective": true,
+  "reported_mae": 126.0,
+  "claim": {
+    "statement": "Day-ahead daily load forecast: MAE <= 3.5% of mean test-window load, better than seasonal-naive and persistence baselines on the same window.",
+    "max_mae_pct_of_mean": 3.5,
+    "must_beat": [
+      "seasonal_naive",
+      "persistence"
+    ]
+  },
+  "verdict": {
+    "status": "FAIL",
+    "reason_code": "DATA",
+    "audits": [
+      {
+        "name": "prediction_alignment",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "",
+        "metrics": {
+          "n_test_rows": 31
+        }
+      },
+      {
+        "name": "train_test_isolation",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "",
+        "metrics": {}
+      },
+      {
+        "name": "feature_target_proximity",
+        "status": "fail",
+        "reason_code": "DATA",
+        "detail": "target leakage: features [('load_settlement', 0.9990167494618354)] are near-copies of the target (|corr| > 0.995); without them MAE grows 13.6x (126 -> 1714), N=1 drop-test",
+        "metrics": {
+          "suspects": [
+            [
+              "load_settlement",
+              0.999
+            ]
+          ],
+          "mae_without_suspects": 1713.6,
+          "collapse_ratio": 13.6
+        }
+      },
+      {
+        "name": "deployment_consistency",
+        "status": "inconclusive",
+        "reason_code": "DATA",
+        "detail": "feature availability unknown to the audit for: ['load_settlement'] (N=1 case)",
+        "metrics": {}
+      },
+      {
+        "name": "metric_reproduction",
+        "status": "ok",
+        "reason_code": "reported MAE reproduces from predictions (diff 0.0000%)",
+        "detail": {
+          "reported_mae": 126.0,
+          "recomputed_mae": 126.0,
+          "relative_diff": 0.0
+        },
+        "metrics": {}
+      },
+      {
+        "name": "claim_conditions",
+        "status": "ok",
+        "reason_code": "claim holds: MAE 126 <= 1880; beats persistence 2888 and seasonal-naive 3086",
+        "detail": {
+          "recomputed_mae": 126.0,
+          "threshold_mae": 1879.5,
+          "persistence_mae": 2887.5,
+          "seasonal_naive_mae": 3086.3,
+          "mean_load_test_window": 53701.4
+        },
+        "metrics": {}
+      },
+      {
+        "name": "trial_disclosure",
+        "status": "ok",
+        "reason_code": "single pre-registered configuration (K=1); no multiplicity correction needed",
+        "detail": "",
+        "metrics": {
+          "K": 1
+        }
+      }
+    ]
+  }
+}

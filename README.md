@@ -12,15 +12,17 @@ format: permutation-test-ml (V-PTM-001).
 
 ## Status
 
-MVP subset of the Appendix A start set (record version 1):
+Record version 2: the 3+3 subset of the Appendix A start set.
 
-- 1 defective case implemented (N=1)
-- 1 clean case implemented (N=1)
-- NC-NULL negative control implemented (N=5)
+- 3 defective cases (N=1 each): look-ahead leak, backtest contamination,
+  target leakage
+- 3 clean cases (N=1 each): linear, scaled ridge, gradient boosting
+- NC-NULL negative control (N=5)
 
-The full 5 defective + 5 clean set is NOT implemented yet. No paid verdicts
-are offered until the full set is published (service brief, section 11).
-See trust/limitations.md.
+Not implemented yet (no claims made): DST/timezone handling, cherry-picked
+metrics, selection bias in best-of-K search; hourly data; external dataset.
+No paid verdicts are offered until the full 5+5 set is published (service
+brief, section 11). See trust/limitations.md.
 
 ## Layout
 
@@ -51,12 +53,14 @@ commands on the committed data reproduces every number below.
    window exactly, no non-finite values
 2. train/test isolation: train, test and confirmation windows must be
    disjoint and ordered (backtest contamination -> DATA)
-3. deployment consistency: features used by the fitted model are checked
+3. feature-target proximity: features (including case-built ones, inspected
+   through the case's own feature builder re-run by the audit) with
+   |corr| > 0.995 against the target trigger a drop-test; if MAE collapses
+   (>= 2x) without them -> target leakage (DATA)
+4. deployment consistency: features used by the fitted model are checked
    against the audit-side availability map; a deployment re-run (refit
    without unavailable features) must reproduce the reported number within
    a 20% relative gap (look-ahead leak -> DATA)
-4. feature-target proximity: |corr| > 0.995 features trigger a drop-test;
-   if MAE collapses (>= 2x) without them -> target leakage (DATA)
 5. metric reproduction: the reported number must be recomputable from the
    returned predictions on the full test window within 1%
    (otherwise CONFLICT_EVIDENCE)
@@ -69,21 +73,33 @@ commands on the committed data reproduces every number below.
 
 Reason codes are the frozen CV0-TrustLayer-v3.5 vocabulary (9 values).
 
-## Results (record version 1)
+## Results (record version 2)
 
-Cases (N=1 per row):
+Defective cases (N=1 each; all must be FAIL):
 
-| case | defective | verdict | reason | numbers |
+| case | defect | verdict | reason | numbers |
 |---|---|---|---|---|
-| defect_01_look_ahead | yes | FAIL | DATA | reported MAE 1387.4 MW; deployment re-run 1713.6 MW; gap 23.5% > 20% threshold |
-| clean_01_linear_forecast_features | no | PASS | - | MAE 1713.6 MW = 3.19% of mean load 53701 MW; beats persistence 2888 MW and seasonal-naive 3086 MW (N=1 window, 30 days) |
+| defect_01_look_ahead | look-ahead leak | FAIL | DATA | reported MAE 1387.4 MW; deployment re-run 1713.6 MW; gap 23.5% > 20% threshold |
+| defect_03_backtest_contamination | train/test overlap | FAIL | DATA | train window overlaps test by 15 days; reported MAE 1604.9 MW on contaminated backtest |
+| defect_04_target_leakage | near-copy feature | FAIL | DATA | corr(load_settlement, load) = 0.999; reported MAE 126.0 MW; without the feature 1713.6 MW (collapse 13.6x) |
+
+Clean cases (N=1 each; all must be PASS):
+
+| case | model | verdict | numbers |
+|---|---|---|---|
+| clean_01_linear_forecast_features | linear | PASS | MAE 1713.6 MW = 3.19% of mean load 53701 MW |
+| clean_02_ridge_scaled | scaled Ridge | PASS | MAE 1714.3 MW = 3.19% |
+| clean_03_gradient_boosting | gradient boosting | PASS | MAE 1286.3 MW = 2.40% |
+
+All three clean cases beat persistence (2888 MW) and seasonal-naive
+(3086 MW) on the same 30-day test window (N=1 window).
 
 Summary (N is stated next to each number):
 
-- sensitivity (defective detected): 1/1 (N=1), Wilson 95% CI [0.207, 1.000]
-- specificity (clean passed): 1/1 (N=1), Wilson 95% CI [0.207, 1.000]
-- false PASS on defective: 0/1 (N=1); rule-of-three upper bound at 0/1 is
-  about 300%: this single case demonstrates the mechanism and nothing more
+- sensitivity (defective detected): 3/3 (N=3), Wilson 95% CI [0.439, 1.000]
+- specificity (clean passed): 3/3 (N=3), Wilson 95% CI [0.439, 1.000]
+- false PASS on defective: 0/3 (N=3); conservative rule-of-three upper
+  bound at 0/3 is about 100%
 
 NC-NULL control (clean pipeline re-run on block-permuted target data,
 7-day blocks, seeds 1..5; the procedure must not certify):
@@ -98,15 +114,23 @@ NC-NULL control (clean pipeline re-run on block-permuted target data,
 - naive point-shuffle of labels is NOT used (invalid on trended data;
   measured in V-PTM-001, claim C-04)
 
-## What the defect is (case D1)
+## What the defects are
 
-The defective pipeline trains and evaluates with realised weather
-(`temp_actual`) among its features. At inference time, a day-ahead forecast
-only has the temperature forecast (`temp_forecast`) available. The reported
-backtest MAE (1387.4 MW) is not attainable in deployment: the deployment
-re-run gives 1713.6 MW. The model involuntarily looks into the future; the
-evaluation, not the model, is defective. This mirrors the failure mode in
-section 2 of the service brief.
+D1 (look-ahead leak): the pipeline trains and evaluates with realised
+weather (temp_actual) among its features. At inference time, a day-ahead
+forecast only has the temperature forecast (temp_forecast) available. The
+reported backtest MAE is not attainable in deployment: the model
+involuntarily looks into the future. Mirrors section 2 of the service brief.
+
+D3 (backtest contamination): the pipeline computed its own split and
+extended the train window 15 days into the test window (off-by-N accident
+in index arithmetic). Test rows seen during training make the reported MAE
+unattainably good.
+
+D4 (target leakage): the feature table contains load_settlement = same-day
+realised load plus small reporting noise (a realistic dataset-join
+accident: settlement actuals merged into forecast features). The model's
+reported MAE collapses to the reporting-noise level (126.0 MW).
 
 ## Verification status
 
@@ -121,11 +145,10 @@ section 2 of the service brief.
 
 ## Planned next record versions
 
-- Defective cases: DST/timezone handling (ENVIRONMENT), backtest
-  contamination (DATA), target leakage (DATA), cherry-picked metrics
-  (CONFLICT_EVIDENCE), selection bias in best-of-K search (NOISE).
-- Clean cases: gradient boosting, autoregressive variants, ridge.
-- Hourly data with a timezone for the DST case.
+- Defective cases: DST/timezone handling (ENVIRONMENT, needs hourly data
+  with a timezone), cherry-picked metrics (CONFLICT_EVIDENCE), selection
+  bias in best-of-K search (NOISE).
+- Clean case variety on harder feature sets.
 - An external dataset (ENTSO-E or similar; requires registration).
 - Each extension is a new record version with a new criteria lock and a
   full re-run for PASS claims.

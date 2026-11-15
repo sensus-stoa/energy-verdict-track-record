@@ -31,21 +31,21 @@
         "metrics": {}
       },
       {
-        "name": "deployment_consistency",
-        "status": "ok",
-        "reason_code": "",
-        "detail": "",
-        "metrics": {
-          "n_features": 5
-        }
-      },
-      {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
         "detail": "",
         "metrics": {
           "suspects": []
+        }
+      },
+      {
+        "name": "deployment_consistency",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "",
+        "metrics": {
+          "n_features": 5
         }
       },
       {
