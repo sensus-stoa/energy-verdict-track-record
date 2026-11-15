@@ -1,7 +1,7 @@
 {
   "tool": "trust_check",
   "version": "0.1.0",
-  "checked_at": "2026-11-15T16:54:25Z",
+  "checked_at": "2026-11-15T18:40:19Z",
   "root": "/home/ninjacat/Desktop/refusal/energy-verdict-track-record",
   "overall": "PASS",
   "claims": [
@@ -111,12 +111,12 @@
     {
       "id": "LOCK_BLOB",
       "status": "PASS",
-      "detail": "locked trust/claims.md non-empty (10336 bytes at 857cc60c0342...)"
+      "detail": "locked trust/claims.md non-empty (10336 bytes at 6858f2ee338c...)"
     },
     {
       "id": "LOCK_ANCESTOR",
       "status": "PASS",
-      "detail": "857cc60c0342... is an ancestor of HEAD"
+      "detail": "6858f2ee338c... is an ancestor of HEAD"
     }
   ]
 }
