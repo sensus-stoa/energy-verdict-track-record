@@ -15,8 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.case_api import Windows                                       # noqa: E402
-from src.data_generator import generate_daily, windows                 # noqa: E402
-from src.metrics import block_permute_target, persistence_mae, seasonal_naive_mae  # noqa: E402
+from src.data_generator import (generate_daily, generate_hourly,       # noqa: E402
+                                windows, windows_hourly)
+from src.metrics import (baseline_lags, block_permute_target,          # noqa: E402
+                         naive_baseline_mae, persistence_mae,
+                         seasonal_naive_mae)
 from src.run_track_record import REGISTRY                              # noqa: E402
 from src.verdict_procedure import AuditConfig, run_verdict             # noqa: E402
 
@@ -24,20 +27,28 @@ import importlib
 
 
 def main() -> None:
-    data = generate_daily()
+    data_daily = generate_daily()
+    data_hourly = generate_hourly()
     w = windows()
     win = Windows(train=w["train"], test=w["test"], confirmation=w["confirmation"])
     cfg = AuditConfig()
 
-    y_test = data.loc[(data.index >= w["test"][0]) & (data.index < w["test"][1]), "load"]
+    y_test = data_daily.loc[(data_daily.index >= w["test"][0]) & (data_daily.index < w["test"][1]), "load"]
     mean_load = float(y_test.mean())
     threshold = 0.035 * mean_load
-    print(f"mean test-window load {mean_load:.0f} MW; claim threshold {threshold:.0f} MW; "
-          f"persistence {persistence_mae(data, w['test']):.0f}; "
-          f"seasonal-naive {seasonal_naive_mae(data, w['test']):.0f}")
+    print(f"DAILY: mean {mean_load:.0f} MW; claim threshold {threshold:.0f} MW; "
+          f"persistence {persistence_mae(data_daily, w['test']):.0f}; "
+          f"seasonal-naive {seasonal_naive_mae(data_daily, w['test']):.0f}")
+    wh = windows_hourly()
+    yh = data_hourly.loc[(data_hourly.index >= wh["test"][0]) & (data_hourly.index < wh["test"][1]), "load"]
+    lag_p, lag_s = baseline_lags(data_hourly)
+    print(f"HOURLY: mean {yh.mean():.0f} MW; hourly claim threshold {0.06 * yh.mean():.0f} MW; "
+          f"persistence(lag{lag_p}) {naive_baseline_mae(data_hourly, wh['test'], lag_p):.0f}; "
+          f"seasonal(lag{lag_s}) {naive_baseline_mae(data_hourly, wh['test'], lag_s):.0f}")
     print("-" * 72)
 
-    for case_id, (module_path, is_defective) in REGISTRY.items():
+    for case_id, (module_path, is_defective, dataset_key) in REGISTRY.items():
+        data = data_hourly if dataset_key == "hourly" else data_daily
         mod = importlib.import_module(module_path)
         artifact = mod.run(data, win)
         v = run_verdict(data, artifact, cfg)

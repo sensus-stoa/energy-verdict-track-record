@@ -16,20 +16,33 @@ def rmse(y_true: pd.Series, y_pred: pd.Series) -> float:
     return float(np.sqrt(np.mean((np.asarray(y_true) - np.asarray(y_pred)) ** 2)))
 
 
-def persistence_mae(df: pd.DataFrame, window: tuple[str, str], target: str = "load") -> float:
-    """Baseline 'tomorrow = today': y(t-1) evaluated on the window."""
+def naive_baseline_mae(df: pd.DataFrame, window: tuple[str, str], lag: int,
+                       target: str = "load") -> float:
+    """Baseline 'value = same clock position `lag` rows earlier'."""
     y = df[target]
-    pred = y.shift(1)
+    pred = y.shift(lag)
     mask = (df.index >= window[0]) & (df.index < window[1]) & pred.notna()
     return float(np.mean(np.abs(y[mask] - pred[mask])))
+
+
+def persistence_mae(df: pd.DataFrame, window: tuple[str, str], target: str = "load") -> float:
+    """Daily 'tomorrow = today': y(t-1)."""
+    return naive_baseline_mae(df, window, 1, target)
 
 
 def seasonal_naive_mae(df: pd.DataFrame, window: tuple[str, str], target: str = "load") -> float:
-    """Baseline 'tomorrow = same weekday last week': y(t-7)."""
-    y = df[target]
-    pred = y.shift(7)
-    mask = (df.index >= window[0]) & (df.index < window[1]) & pred.notna()
-    return float(np.mean(np.abs(y[mask] - pred[mask])))
+    """Daily 'tomorrow = same weekday last week': y(t-7)."""
+    return naive_baseline_mae(df, window, 7, target)
+
+
+def baseline_lags(df: pd.DataFrame) -> tuple[int, int]:
+    """Cadence-aware baseline lags: (persistence, seasonal) = (24,168) hourly,
+    (1,7) daily."""
+    idx = df.index
+    step = pd.Series(idx[1:] - idx[:-1]).median() if len(idx) > 1 else pd.Timedelta("1D")
+    if step <= pd.Timedelta("1h"):
+        return (24, 168)
+    return (1, 7)
 
 
 def wilson_ci(k: int, n: int, z: float = 1.959963984540054) -> tuple[float, float]:

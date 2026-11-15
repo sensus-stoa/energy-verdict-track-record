@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 from src.case_api import CaseArtifact, Windows
-from src.metrics import mae, persistence_mae, seasonal_naive_mae
+from src.metrics import baseline_lags, mae, naive_baseline_mae
 
 REASON_CODES = (
     "DATA", "GRAMMAR", "NOISE", "DEPTH", "ACCESS", "BUDGET",
@@ -44,8 +44,12 @@ AUDIT_FEATURE_AVAILABILITY: dict[str, bool] = {
     "doy_sin": True,         # calendar
     "doy_cos": True,
     "dow_weekend": True,
+    "hour_sin": True,        # local wall-clock hour: known in advance
+    "hour_cos": True,
     "load_lag1": True,       # yesterday's actual load: published at day close
     "load_lag7": True,
+    "load_lag24": True,      # hourly: same hour yesterday
+    "load_lag168": True,     # hourly: same hour last week
 }
 
 LOOKAHEAD_GAP_THRESHOLD = 0.20     # relative reported-vs-deployment MAE gap
@@ -61,7 +65,8 @@ class AuditConfig:
     leak_corr_threshold: float = LEAK_CORR_THRESHOLD
     leak_collapse_ratio: float = LEAK_COLLAPSE_RATIO
     metric_tolerance: float = METRIC_TOLERANCE
-    min_improvement_for_replication: float = 0.05
+    min_improvement_for_replication: float = 0.03
+    domain_tz: str = "Europe/Berlin"   # for timezone-integrity checks on hourly data
 
 
 @dataclass
@@ -144,9 +149,10 @@ def audit_deployment_consistency(data, art: CaseArtifact, cfg: AuditConfig) -> A
 
 
 def audit_feature_target_proximity(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
-    ev = _sel(data, art.windows.test)
-    y = ev["load"]
     feat_df = art.feature_frame_fn(data)
+    # target taken from the SAME frame the case built: for a case whose frame
+    # has a broken index (e.g. duplicated wall hours) x and y stay consistent
+    y = _sel(feat_df, art.windows.test)["load"]
     suspects = []
     for f in art.feature_names_used:
         if f not in feat_df.columns:
@@ -214,14 +220,16 @@ def audit_claim_conditions(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
     y = _sel(data, art.windows.test)["load"]
     recomputed = mae(y, art.predictions)
     threshold = art.claim.max_mae_pct_of_mean / 100.0 * float(y.mean())
-    mae_p = persistence_mae(data, art.windows.test)
-    mae_s = seasonal_naive_mae(data, art.windows.test)
+    lag_p, lag_s = baseline_lags(data)
+    mae_p = naive_baseline_mae(data, art.windows.test, lag_p)
+    mae_s = naive_baseline_mae(data, art.windows.test, lag_s)
     metrics = {
         "recomputed_mae": round(recomputed, 1),
         "threshold_mae": round(threshold, 1),
         "persistence_mae": round(mae_p, 1),
         "seasonal_naive_mae": round(mae_s, 1),
         "mean_load_test_window": round(float(y.mean()), 1),
+        "baseline_lags": [lag_p, lag_s],
     }
     failures = []
     if recomputed > threshold:
@@ -252,8 +260,9 @@ def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
             metrics={"K": k},
         )
     best = min(log, key=lambda e: e["test_mae"])
-    naive_test = seasonal_naive_mae(data, art.windows.test)
-    naive_conf = seasonal_naive_mae(data, art.windows.confirmation)
+    lag_p, lag_s = baseline_lags(data)
+    naive_test = naive_baseline_mae(data, art.windows.test, lag_s)
+    naive_conf = naive_baseline_mae(data, art.windows.confirmation, lag_s)
     preds_c, mae_c = art.retrain_eval_fn(data, best["features"],
                                          art.windows.train, art.windows.confirmation)
     imp_test = (naive_test - best["test_mae"]) / naive_test
@@ -277,9 +286,48 @@ def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
     )
 
 
+def audit_timezone_integrity(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
+    """Structural check of the case's working frame: no duplicated timestamps;
+    for hourly cadence, no missing wall-clock hours in the domain timezone."""
+    fdf = art.feature_frame_fn(data)
+    idx = fdf.index
+    dups = int(idx.duplicated().sum())
+    problems = []
+    if dups > 0:
+        problems.append(
+            f"{dups} duplicated timestamps in the working feature frame "
+            f"(naive local time across a DST transition duplicates wall-clock hours)"
+        )
+    diffs = pd.Series(idx[1:] - idx[:-1]) if len(idx) > 1 else pd.Series(dtype="timedelta64[ns]")
+    median_step = diffs.median() if len(diffs) else pd.Timedelta(0)
+    if median_step <= pd.Timedelta("1h"):
+        # hourly cadence: gap check via tz-aware local calendar (only if no dups;
+        # otherwise localize is undefined and the duplicate finding already fails)
+        if dups == 0 and idx.tz is None:
+            try:
+                localized = idx.tz_localize("UTC").tz_convert(cfg.domain_tz)
+                full_local = pd.date_range(localized.min(), localized.max(), freq="h",
+                                           tz=cfg.domain_tz)
+                missing = len(full_local.difference(localized.unique()))
+                if missing > 0:
+                    problems.append(f"{missing} missing wall-clock hours vs {cfg.domain_tz} calendar")
+            except Exception as e:  # ambiguous/nonexistent local times
+                problems.append(f"tz localization failed: {type(e).__name__}")
+    if problems:
+        return AuditResult(
+            "timezone_integrity", "fail", "ENVIRONMENT",
+            "timezone handling defect: " + "; ".join(problems) +
+            " (N=1 case, working frame inspected through the case feature builder)",
+        )
+    cadence = "hourly" if median_step <= pd.Timedelta("1h") else "daily"
+    return AuditResult("timezone_integrity", "ok",
+                       f"no duplicate/gap anomalies at {cadence} cadence")
+
+
 AUDITS = (
     audit_prediction_alignment,
     audit_train_test_isolation,
+    audit_timezone_integrity,
     audit_feature_target_proximity,
     audit_deployment_consistency,
     audit_metric_reproduction,

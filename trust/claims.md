@@ -9,21 +9,24 @@ trust/evidence-manifest.json (criteria_lock). Any change to these criteria
 after the lock commit is a new version marked post-hoc and requires a
 re-run for PASS.
 
-Scope of this record version: 3 planted defective cases (N=1 each: look-ahead
-leak, backtest contamination, target leakage), 3 clean cases (N=1 each:
-linear, scaled ridge, gradient boosting), and the NC-NULL negative control
-(N=5). This is the 3+3 subset of the Appendix A start set (5 defective +
-5 clean). DST/timezone handling, cherry-picked metrics and selection bias
-cases are not implemented yet; no claim is made about them. A new record
-version will extend the set.
+Scope of this record version: the full defect-class battery of 6 planted
+defective cases (N=1 each: look-ahead leak, DST/timezone handling,
+backtest contamination, target leakage, cherry-picked metric, selection
+bias) and 5 clean cases (N=1 each: linear, scaled ridge, gradient boosting,
+timezone-aware hourly, scaled ElasticNet), plus the NC-NULL negative
+control (N=5). This satisfies the Appendix A minimum (5 defective + 5
+clean) and exceeds it by one defective class (all six classes named in the
+work plan are covered). No further defect classes are claimed.
 
 Audit-side ground truth used by the procedure (frozen here): feature
 availability at inference time for the synthetic energy domain is
 temp_actual = NOT available (realised weather is only known after the day
 ends), temp_forecast = available at 00:00 of the target day, calendar
-features and load lags (yesterday, last week) = available. This map lives in
-src/verdict_procedure.py (AUDIT_FEATURE_AVAILABILITY) and is justified by
-the data generator semantics (src/data_generator.py).
+features and load lags (yesterday, last week; hourly lags 24/168) =
+available. This map lives in src/verdict_procedure.py
+(AUDIT_FEATURE_AVAILABILITY) and is justified by the data generator
+semantics (src/data_generator.py). Baseline lags are cadence-aware:
+persistence/seasonal = (1, 7) for daily data and (24, 168) for hourly data.
 
 ## C-01 Procedure detects a planted look-ahead leak
 Claim: the verdict procedure FAILs a day-ahead load forecasting pipeline
@@ -109,4 +112,69 @@ PASS criterion: verdict = PASS with all audits ok; recomputed MAE matches
 reported within 1%; claim holds (MAE <= 3.5% of mean load; better than
 persistence and seasonal-naive).
 Reference values from the committed run: MAE 1286.3 MW = 2.40% of mean load.
+Verification V-01: python -m src.run_track_record --cases all
+
+## C-08 Procedure detects a DST/timezone handling defect
+Claim: the verdict procedure FAILs an hourly pipeline whose working feature
+frame is built on naive local wall time: across the October fall-back
+transition (Europe/Berlin) this duplicates a wall-clock hour in the frame
+and breaks the wall-clock lag alignment, while the reported MAE barely
+moves (the defect is invisible in the pipeline's own report).
+Case: defect_02_dst_timezone (N=1 planted defective case).
+PASS criterion: verdict = FAIL with reason_code = ENVIRONMENT; the
+timezone-integrity audit flags the duplicated timestamps in the working
+frame.
+Reference values from the committed run: reported MAE 107.4 MW; the working
+frame contains 1 duplicated wall-clock hour (2023-10-29, Europe/Berlin).
+Verification V-01: python -m src.run_track_record --case defect_02_dst_timezone
+
+## C-09 Procedure passes a timezone-aware hourly pipeline
+Claim: the verdict procedure PASSes a clean hourly pipeline on the same
+hourly data whose working frame keeps the UTC index and derives local-hour
+features through a proper timezone-aware conversion (twin of C-08's
+defective case).
+Case: clean_04_hourly_tz_aware (N=1 clean case).
+PASS criterion: verdict = PASS with all audits ok; recomputed MAE matches
+reported within 1%; claim holds (MAE <= 6.0% of mean hourly load; better
+than hourly persistence (24h lag) and seasonal-naive (168h lag)).
+Reference values from the committed run: MAE 108.1 MW = 4.39% of mean hourly
+load 2461 MW; hourly persistence 184 MW; hourly seasonal-naive 136 MW
+(N=1 window, 168 hours).
+Verification V-01: python -m src.run_track_record --cases all
+
+## C-10 Procedure detects a cherry-picked metric
+Claim: the verdict procedure FAILs a pipeline whose reported number is not
+reproducible from its returned predictions on the full pre-registered
+window: the reported MAE is computed after silently dropping the 10
+highest-error days of the 30-day window.
+Case: defect_05_cherry_picked_metric (N=1 planted defective case).
+PASS criterion: verdict = FAIL with reason_code = CONFLICT_EVIDENCE; the
+metric-reproduction audit flags the mismatch beyond the 1% tolerance.
+Reference values from the committed run: reported MAE 996.5 MW;
+recomputed full-window MAE 1713.6 MW (relative diff 72.0% > 1%).
+Verification V-01: python -m src.run_track_record --case defect_05_cherry_picked_metric
+
+## C-11 Procedure detects selection bias (best of K on the test window)
+Claim: the verdict procedure FAILs a pipeline that tried K=20 linear
+configurations on the TEST window (calendar + m pure-noise columns,
+m = 10..200, no real exogenous or lag signal) and reports the best one: the
+reported number does not satisfy the pre-registered claim, and the
+trial-disclosure audit classifies the outcome as a selection artifact.
+Case: defect_06_selection_bias (N=1 planted defective case; trial log
+disclosed - the undisclosed-search variant is out of scope, see
+limitations).
+PASS criterion: verdict = FAIL with reason_code = NOISE.
+Reference values from the committed run: reported best-of-20 MAE 2607.8 MW
+exceeds the claim threshold 1880 MW (3.5% of mean load); none of the
+configurations has exogenous skill by construction.
+Verification V-01: python -m src.run_track_record --case defect_06_selection_bias
+
+## C-12 Procedure passes a sparse-regularised pipeline
+Claim: the verdict procedure PASSes a clean scaled-ElasticNet pipeline
+(L1+L2 family, standardised features, single configuration).
+Case: clean_05_elastic_net (N=1 clean case).
+PASS criterion: verdict = PASS with all audits ok; recomputed MAE matches
+reported within 1%; claim holds (MAE <= 3.5% of mean load; better than
+persistence and seasonal-naive).
+Reference values from the committed run: MAE 1726.7 MW = 3.21% of mean load.
 Verification V-01: python -m src.run_track_record --cases all

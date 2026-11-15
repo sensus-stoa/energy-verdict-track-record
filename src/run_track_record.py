@@ -20,7 +20,8 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(ROOT))
 
 from src.case_api import Windows                                  # noqa: E402
-from src.data_generator import load_or_generate, windows          # noqa: E402
+from src.data_generator import (load_or_generate, load_or_generate_hourly,  # noqa: E402
+                                windows)
 from src.metrics import block_permute_target, rule_of_three_upper, wilson_ci  # noqa: E402
 from src.verdict_procedure import AuditConfig, run_verdict        # noqa: E402
 
@@ -29,12 +30,22 @@ RESULTS_DIR = ROOT / "results"
 PER_CASE_DIR = RESULTS_DIR / "per_case"
 
 REGISTRY = {
-    "defect_01_look_ahead": ("src.defects.look_ahead_leak", True),
-    "defect_03_backtest_contamination": ("src.defects.backtest_contamination", True),
-    "defect_04_target_leakage": ("src.defects.target_leakage", True),
-    "clean_01_linear_forecast_features": ("src.clean_cases.clean_pipeline_01", False),
-    "clean_02_ridge_scaled": ("src.clean_cases.clean_pipeline_02", False),
-    "clean_03_gradient_boosting": ("src.clean_cases.clean_pipeline_03", False),
+    "defect_01_look_ahead": ("src.defects.look_ahead_leak", True, "daily"),
+    "defect_02_dst_timezone": ("src.defects.dst_timezone", True, "hourly"),
+    "defect_03_backtest_contamination": ("src.defects.backtest_contamination", True, "daily"),
+    "defect_04_target_leakage": ("src.defects.target_leakage", True, "daily"),
+    "defect_05_cherry_picked_metric": ("src.defects.cherry_picked_metric", True, "daily"),
+    "defect_06_selection_bias": ("src.defects.selection_bias", True, "daily"),
+    "clean_01_linear_forecast_features": ("src.clean_cases.clean_pipeline_01", False, "daily"),
+    "clean_02_ridge_scaled": ("src.clean_cases.clean_pipeline_02", False, "daily"),
+    "clean_03_gradient_boosting": ("src.clean_cases.clean_pipeline_03", False, "daily"),
+    "clean_04_hourly_tz_aware": ("src.clean_cases.clean_pipeline_04_hourly", False, "hourly"),
+    "clean_05_elastic_net": ("src.clean_cases.clean_pipeline_05_elastic_net", False, "daily"),
+}
+
+DATASET_LOADERS = {
+    "daily": load_or_generate,
+    "hourly": load_or_generate_hourly,
 }
 
 NULL_CONTROL_ID = "NC-NULL"
@@ -42,7 +53,7 @@ NULL_CONTROL_N = 5
 
 
 def run_case(case_id: str, data, win: Windows, cfg: AuditConfig) -> dict:
-    module_path, is_defective = REGISTRY[case_id]
+    module_path, is_defective, _dataset = REGISTRY[case_id]
     mod = importlib.import_module(module_path)
     artifact = mod.run(data, win)
     verdict = run_verdict(data, artifact, cfg)
@@ -95,13 +106,16 @@ def main() -> int:
         print(f"unknown cases: {unknown}; known: {list(REGISTRY)}")
         return 2
 
-    data = load_or_generate()
+    data_daily = load_or_generate()
+    data_hourly = load_or_generate_hourly()
     w = windows()
     win = Windows(train=w["train"], test=w["test"], confirmation=w["confirmation"])
     cfg = AuditConfig()
 
     rows = []
     for case_id in ids:
+        _, is_def, dataset_key = REGISTRY[case_id]
+        data = data_hourly if dataset_key == "hourly" else data_daily
         r = run_case(case_id, data, win, cfg)
         rows.append(r)
         PER_CASE_DIR.mkdir(parents=True, exist_ok=True)

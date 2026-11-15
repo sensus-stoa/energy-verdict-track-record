@@ -32,6 +32,7 @@ TEST_DAYS = 30
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "synthetic"
 DEFAULT_CSV = DATA_DIR / "energy_daily.csv"
+HOURLY_CSV = DATA_DIR / "energy_hourly.csv"
 
 
 def _ar1(rng: np.random.Generator, n: int, rho: float, sigma_innov: float) -> np.ndarray:
@@ -91,10 +92,64 @@ def windows() -> dict:
     }
 
 
+def generate_hourly(seed: int = 43, n_hours: int = 8760) -> pd.DataFrame:
+    """Hourly city load, full year 2023, naive UTC index (semantics: UTC).
+
+    Contains both Europe/Berlin DST transitions. The raw index is strictly
+    regular in UTC; wall-clock oddities (one duplicated and one missing local
+    hour) appear only if a pipeline converts to naive local time - which is
+    exactly the planted bug in defect_02_dst_timezone.
+    """
+    rng = np.random.default_rng(seed)
+    idx_utc = pd.date_range("2023-01-01", periods=n_hours, freq="h")
+    local = idx_utc.tz_localize("UTC").tz_convert("Europe/Berlin")
+    doy = local.dayofyear.to_numpy(dtype=float)
+    hod = local.hour.to_numpy(dtype=float)
+    dow = local.dayofweek.to_numpy()
+
+    annual = 10.0 - 10.0 * np.cos(2.0 * np.pi * (doy - 15.0) / 365.25)
+    diurnal_t = 4.0 * np.sin(2.0 * np.pi * (hod - 9.0) / 24.0)
+    temp_actual = annual + diurnal_t + _ar1(rng, n_hours, rho=0.95, sigma_innov=0.8)
+    fc_err = _ar1(rng, n_hours, rho=0.8, sigma_innov=0.7) + rng.normal(0.0, 0.3, n_hours)
+    temp_forecast = temp_actual + fc_err
+
+    diurnal_load = (300.0 * np.maximum(0.0, np.sin(2.0 * np.pi * (hod - 6.0) / 24.0))
+                    + 500.0 * np.maximum(0.0, np.sin(2.0 * np.pi * (hod - 16.0) / 24.0)))
+    hdd = 30.0 * np.maximum(0.0, 16.0 - temp_actual)
+    cdd = 15.0 * np.maximum(0.0, temp_actual - 22.0)
+    weekend = np.where(dow >= 5, -250.0, 0.0)
+    load = 2000.0 + hdd + cdd + diurnal_load + weekend + _ar1(rng, n_hours, rho=0.85, sigma_innov=50.0)
+
+    return pd.DataFrame(
+        {"temp_actual": temp_actual, "temp_forecast": temp_forecast, "load": load},
+        index=idx_utc,
+    )
+
+
+def load_or_generate_hourly(path: Path = HOURLY_CSV) -> pd.DataFrame:
+    if path.exists():
+        return pd.read_csv(path, parse_dates=["date"], index_col="date")
+    df = generate_hourly()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index_label="date")
+    return df
+
+
+def windows_hourly() -> dict:
+    """Hourly evaluation windows (UTC): test week contains the fall-back
+    transition (2023-10-29 01:00 UTC)."""
+    return {
+        "train": ("2023-01-01", "2023-10-25"),
+        "test": ("2023-10-25", "2023-11-01"),
+        "confirmation": ("2023-11-01", "2023-12-01"),
+    }
+
+
 if __name__ == "__main__":
     df = generate_daily()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     df.to_csv(DEFAULT_CSV, index_label="date")
     print(f"written {DEFAULT_CSV} rows={len(df)}")
-    print(df.head(3))
-    print(df.tail(3))
+    dfh = generate_hourly()
+    dfh.to_csv(HOURLY_CSV, index_label="date")
+    print(f"written {HOURLY_CSV} rows={len(dfh)}")
