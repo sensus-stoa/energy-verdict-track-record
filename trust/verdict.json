@@ -3,7 +3,7 @@
   "verdict_id": "V-EVTR-003",
   "date": "2026-11-15",
   "valid_until": "object-change",
-  "object_version": "e5f8239a7f2440e323f1be5670f328c0b5ba29b0",
+  "object_version": "8b468e1992fe6d27ece0eedf973607dbf0d43fda",
   "protocol_version": "CV0-TrustLayer-v3.5",
   "executor": "Automated agent session (Hermes, 2026-11-15) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
   "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-002 (3+3 subset) and V-EVTR-001 (1+1 subset); superseded verdicts remain in git history",
@@ -95,7 +95,7 @@
     }
   ],
   "properties_separate": {
-    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit e5f8239a7f2440e323f1be5670f328c0b5ba29b0; criteria locked at 8fd2947f9fbb157c9bace6088d66f65b428a9582 (C-01..C-07 text unchanged from v2 lock, v1 lock dfff4a9f23300c31a5b62280b81950ae8f76005c)",
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 8b468e1992fe6d27ece0eedf973607dbf0d43fda; criteria locked at 97aab0a15fa550b0f78615fc73d54e41a63d1706 (C-01..C-07 text unchanged from v2 lock, v1 lock e6a56ec4cc6dce81ae2da494b1ad96af87c3d834; commit hashes rewritten once before the first push for author-identity normalization, criteria text unchanged)",
     "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
     "reproducibility": "V-01/V-02 deterministic (daily seed 42, hourly seed 43, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
     "validity": "Valid for the synthetic energy domains defined by src/data_generator.py (single city profile, daily and hourly, no holidays, no price effects). NOT evidence about real production pipelines. Appendix A set covered: 6 defective + 5 clean (minimum 5+5 satisfied and exceeded by one defect class)"
