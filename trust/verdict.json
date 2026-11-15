@@ -1,41 +1,69 @@
 {
   "schema": "trust-verdict/v3.5",
-  "verdict_id": "V-EVTR-001",
+  "verdict_id": "V-EVTR-002",
   "date": "2026-11-15",
   "valid_until": "object-change",
-  "object_version": "5be918fda40c19e820f61a52e866c0818a961c2d",
+  "object_version": "5a3777a671c39d0f50583893d251d611eaa4e44a",
   "protocol_version": "CV0-TrustLayer-v3.5",
   "executor": "Automated agent session (Hermes, 2026-11-15) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
-  "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent",
+  "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-001 (record version 1, 1+1 subset)",
   "claims": [
     {
       "id": "C-01",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_01_look_ahead (N=1 planted defective case)",
-      "evidence": ["E-01", "E-02", "E-08", "E-12", "E-14"],
+      "evidence": ["E-01", "E-02", "E-08", "E-16", "E-18"],
       "note": "Verdict FAIL, reason_code DATA. Structural: fitted model uses temp_actual, unavailable at inference. Deployment re-run MAE 1713.6 MW vs reported 1387.4 MW, relative gap 23.5% > 20% threshold"
     },
     {
       "id": "C-02",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_01_linear_forecast_features (N=1 clean case)",
-      "evidence": ["E-01", "E-02", "E-07", "E-12", "E-15"],
+      "evidence": ["E-01", "E-02", "E-07", "E-16", "E-21"],
       "note": "Verdict PASS, all 7 audits ok. Recomputed MAE equals reported (1713.6 MW, diff 0.0). Claim holds: 3.19% of mean load 53701 MW <= 3.5%; beats persistence 2888 MW and seasonal-naive 3086 MW on the same 30-day window (N=1 window)"
     },
     {
       "id": "C-03",
       "status": "PASS",
       "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)",
-      "evidence": ["E-01", "E-02", "E-06", "E-13"],
+      "evidence": ["E-01", "E-02", "E-06", "E-17"],
       "control": "NC-NULL",
       "note": "False PASS 0/5 (N=5). Wilson 95% CI [0.000, 0.434]; conservative rule-of-three upper bound ~60%, stated next to the zero. MAE on null data 2318.2-2960.6 MW, all above the claim threshold 1879.5 MW"
+    },
+    {
+      "id": "C-04",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_03_backtest_contamination (N=1 planted defective case)",
+      "evidence": ["E-01", "E-02", "E-10", "E-16", "E-19"],
+      "note": "Verdict FAIL, reason_code DATA. Train/test isolation audit flags the 15-day window overlap (train 2023-01-01..2023-12-17 vs test from 2023-12-02); reported MAE 1604.9 MW on contaminated backtest"
+    },
+    {
+      "id": "C-05",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_04_target_leakage (N=1 planted defective case)",
+      "evidence": ["E-01", "E-02", "E-11", "E-16", "E-20"],
+      "note": "Verdict FAIL, reason_code DATA. Proximity audit flags load_settlement (corr 0.999 > 0.995); drop-test MAE 126.0 -> 1713.6 MW (collapse ratio 13.6 >= 2.0)"
+    },
+    {
+      "id": "C-06",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_02_ridge_scaled (N=1 clean case)",
+      "evidence": ["E-01", "E-02", "E-12", "E-16", "E-22"],
+      "note": "Verdict PASS, all 7 audits ok. MAE 1714.3 MW = 3.19% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window"
+    },
+    {
+      "id": "C-07",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case clean_03_gradient_boosting (N=1 clean case)",
+      "evidence": ["E-01", "E-02", "E-13", "E-16", "E-23"],
+      "note": "Verdict PASS, all 7 audits ok. MAE 1286.3 MW = 2.40% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window"
     }
   ],
   "properties_separate": {
-    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 5be918fda40c19e820f61a52e866c0818a961c2d; criteria locked at dfff4a9f23300c31a5b62280b81950ae8f76005c",
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 5a3777a671c39d0f50583893d251d611eaa4e44a; criteria locked at 344f6dc8f36528a3c8f716f175306c0387644257 (C-01..C-03 text unchanged from v1 lock dfff4a9f23300c31a5b62280b81950ae8f76005c)",
     "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
     "reproducibility": "V-01/V-02 deterministic (data seed 42, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
-    "validity": "Valid for the synthetic daily energy domain defined by src/data_generator.py (single city profile, no holidays, no hourly structure). NOT evidence about real production pipelines. The full Appendix A set (5 defective + 5 clean) is not implemented in this record version"
+    "validity": "Valid for the synthetic daily energy domain defined by src/data_generator.py (single city profile, no holidays, no hourly structure). NOT evidence about real production pipelines. The Appendix A set is covered to 3 defective + 3 clean of the planned 5 + 5"
   },
   "negative_controls": [
     {
