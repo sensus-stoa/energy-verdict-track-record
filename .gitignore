@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+evtr-venv/
+.pytest_cache/
