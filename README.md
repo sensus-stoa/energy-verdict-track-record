@@ -44,7 +44,6 @@ status; an agent never signs.
     src/defects/                 planted-defect pipelines (D-cases)
     src/run_track_record.py      runner: cases -> verdict -> results CSV
     src/pilot_calibration.py     pre-lock calibration (disclosed, not evidence)
-    tools/trust_check.py         record consistency checker (writes trust_check_report.json)
     data/synthetic/              generated datasets (committed)
     results/                     run outputs (committed, deterministic)
     trust/                       the record
@@ -53,7 +52,17 @@ status; an agent never signs.
 
     python -m venv .venv && .venv/bin/pip install -r requirements.txt
     .venv/bin/python -m src.run_track_record --cases all --with-null-control
-    .venv/bin/python tools/trust_check.py
+    tc -root .
+
+Mechanical validation of the record uses the canonical protocol checker
+`tc` (trust_check v0.1.0) from https://github.com/sensus-stoa/cv0-trust-protocol
+(release binary tc-v0.1.0-linux-amd64, sha256 124b20ab3984eb548088966f448d
+514f45ff2799584cffebadc3caba38a19d3b; build contract in that repository).
+The committed trust_check_report.json is its verbatim output with a single
+normalization: the `root` field (the checker prints the absolute local
+path) is replaced by "." after the run; every check and every other byte
+is untouched. The report is committed immediately after the record commit
+it verifies, so the checked commit is the report commit's parent.
 
 Single-case probe (runs ONLY the named case; rewrites that case's
 results/per_case/<id>.json but never the full-battery
