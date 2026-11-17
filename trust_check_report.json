@@ -1,9 +1,9 @@
 {
   "tool": "trust_check",
-  "version": "0.2.0",
-  "checked_at": "2026-11-17T15:39:31Z",
+  "version": "0.2.1",
+  "checked_at": "2026-11-17T17:02:53Z",
   "root": ".",
-  "checked_commit": "a5fd4bfeb5268629484690f7174d0fb1aadb6b33",
+  "checked_commit": "f792fe8fdb018e36f9ccd33e6a688c1a55d27375",
   "overall": "PASS",
   "claims": [
     {
