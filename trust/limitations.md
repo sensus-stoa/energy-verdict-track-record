@@ -159,9 +159,10 @@ version and re-verified on the locked code:
   caught by must-beat) and defect_08_search_overfit (C-14: audit #8 fires
   while the claim-conditions audit passes - independence of the two
   audits). Sensitivity references updated from 6/6 to 8/8.
-- RECORD-KEEPING changes in v5: the broken external reference
-  "V-PTM-001 (claim C-04)" was removed from claims/manifest/verdict (the
-  point-shuffle caveat is now stated on its own); the C-01 denominator
+- RECORD-KEEPING changes in v5: the broken external record reference (a
+  foreign verdict id, cited here in v4) was removed from
+  claims/manifest/verdict (the point-shuffle caveat is now stated on its
+  own); the C-01 denominator
   formula is explicit; percentages are rounded uniformly to two decimals;
   pilot_calibration.py moved from the manifest's evidence array to a
   separate disclosures section (it is not evidence); the manifest states
