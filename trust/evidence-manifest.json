@@ -4,7 +4,7 @@
   "date": "2026-11-17",
   "object": {
     "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
-    "commit": "124fc3232bb82a3c39f66703ba124804f1f94a92"
+    "commit": "bf73219448ae72c6aa3ea964e6ffdf530bd2b4e6"
   },
   "criteria_lock": {
     "commit": "74f2a46a363f7b83481b8fc22400d17dda954dab",
@@ -314,7 +314,7 @@
       "id": "E-35",
       "type": "summary",
       "path": "README.md",
-      "sha256": "2fa8f9b2b7877f1996fd8be0a331d36a5663110acc80ee572eb694801568dc90",
+      "sha256": "c7042057f7bbefa47743138efde917208b58ab4a68378c64397e95761b349e2f",
       "role": "author-generated",
       "disclosure": "public",
       "note": "Description and results summary; regenerated from the code, dataset and run-output evidence"
@@ -354,15 +354,6 @@
       "role": "author-executed",
       "disclosure": "public",
       "note": "Full audit detail, case D8 (trial-disclosure fail/NOISE while claim conditions pass)"
-    },
-    {
-      "id": "E-40",
-      "type": "code",
-      "path": "tools/trust_check.py",
-      "sha256": "ad333c8e393346f28e708fe79d396768ae093f4f60539e0fdfb8f75b8ab913be",
-      "role": "author-generated",
-      "disclosure": "public",
-      "note": "Record consistency checker; generates trust_check_report.json (hash, xref, lock, sign-off-absent and path-hygiene checks)"
     }
   ],
   "disclosures": [

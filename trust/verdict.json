@@ -3,7 +3,7 @@
   "verdict_id": "V-EVTR-005",
   "date": "2026-11-17",
   "valid_until": "object-change",
-  "object_version": "124fc3232bb82a3c39f66703ba124804f1f94a92",
+  "object_version": "bf73219448ae72c6aa3ea964e6ffdf530bd2b4e6",
   "protocol_version": "CV0-TrustLayer-v3.5",
   "executor": "Automated agent session (Hermes, 2026-11-17) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
   "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-004, V-EVTR-003, V-EVTR-002, V-EVTR-001; superseded verdicts remain in git history",
@@ -71,7 +71,8 @@
       "case_verdict": "PASS",
       "case_reason_code": "",
       "failing_audits": [],
-      "inconclusive_audits": []
+      "inconclusive_audits": [],
+      "control": "NC-NULL"
     },
     {
       "id": "C-04",
@@ -325,7 +326,7 @@
     }
   ],
   "properties_separate": {
-    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 124fc3232bb82a3c39f66703ba124804f1f94a92; criteria locked at 74f2a46a363f7b83481b8fc22400d17dda954dab (claims.md sha256 at lock: 7bb5acdb27db33611e8c66c105454d546b291925847bfcbc473cfeacd736ab32); v5 is a new record version prepared after an independent review of v4 found real defects (trial-disclosure logic, AuditResult serialization, window bounds, unused gap threshold); the review findings and fixes are enumerated in trust/limitations.md",
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit bf73219448ae72c6aa3ea964e6ffdf530bd2b4e6; criteria locked at 74f2a46a363f7b83481b8fc22400d17dda954dab (claims.md sha256 at lock: 7bb5acdb27db33611e8c66c105454d546b291925847bfcbc473cfeacd736ab32); v5 is a new record version prepared after an independent review of v4 found real defects (trial-disclosure logic, AuditResult serialization, window bounds, unused gap threshold); the review findings and fixes are enumerated in trust/limitations.md",
     "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
     "reproducibility": "V-01/V-02 deterministic (daily seed 42, hourly seed 43, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
     "validity": "Valid for the synthetic energy domains defined by src/data_generator.py (single city profile, daily and hourly, no holidays, no price effects). NOT evidence about real production pipelines. Start-set coverage: 8 defective + 5 clean cases across the daily and hourly synthetic domains"
