@@ -1,62 +1,393 @@
 {
   "schema": "trust-manifest/v3.5",
   "protocol_version": "CV0-TrustLayer-v3.5",
-  "date": "2026-11-15",
+  "date": "2026-11-17",
   "object": {
     "repo": "https://github.com/sensus-stoa/energy-verdict-track-record",
-    "commit": "a7ef54814c060a46b2260d68c69760bf1506babb"
+    "commit": "124fc3232bb82a3c39f66703ba124804f1f94a92"
   },
   "criteria_lock": {
-    "commit": "6858f2ee338c3714ded45ce9ec8f8cf1b7b1fef3",
-    "date": "2026-11-15",
-    "note": "Record version 4 lock: criteria C-01..C-12 text byte-identical to version 3 (lock 4e9cb212cb3578249f5019b17662d0bac487e053; v2 lock a308fc369b8df4924b91526698903fe62b40b52b; v1 lock 64dc2a3b1fb1a84316a9435118e4607e24af33d6); editorial change limited to the scope paragraph (internal project references removed for external readers). All V-runs re-executed after this lock; every number reproduced byte-identically (sensitivity 6/6, specificity 5/5, NC-NULL 0/5). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001..003 remain in git history. NOTE: the branch was rewritten twice before publication, metadata only, file contents unchanged throughout: (1) author name normalization (Evgeniy Dolgov / beattle1984@gmail.com), (2) author email normalization to the sensus-stoa noreply address 284329574+sensus-stoa@users.noreply.github.com so GitHub attributes commits to sensus-stoa; personal and work emails were removed from public history at the same time. pointers were re-locked after each rewrite without a re-run (criteria text byte-for-byte unchanged; claims.md sha256 at lock: 092499e8451306e641c215eeeae2d90368bf66578e9ff2e63f1528fb4fc0f159)."
+    "commit": "74f2a46a363f7b83481b8fc22400d17dda954dab",
+    "date": "2026-11-17",
+    "note": "Record version 5 lock: criteria C-01..C-14. Two new claims (C-13 hourly gate, C-14 trial-disclosure independence); C-11 PASS criterion restated for the reworked trial-disclosure audit (fixed unsearched baseline as a second replication edge); C-01 relative_gap denominator formula and the 20% LOOKAHEAD_GAP_THRESHOLD contract made explicit; evaluation-window row counts frozen (test 30, confirmation 60); broken external reference V-PTM-001 removed; percentages rounded uniformly to two decimals. Supersedes v4 lock 6858f2ee338c3714ded45ce9ec8f8cf1b7b1fef3 (v3 lock 4e9cb212cb3578249f5019b17662d0bac487e053; v2 lock a308fc369b8df4924b91526698903fe62b40b52b; v1 lock 64dc2a3b1fb1a84316a9435118e4607e24af33d6). All V-runs re-executed after this lock; every number reproduced byte-identically (sensitivity 8/8, specificity 5/5, NC-NULL 0/5). Any later change to the criteria text is a new version marked post-hoc and requires a full re-run for PASS. Superseded verdicts V-EVTR-001..004 remain in git history. NOTE: the branch was rewritten twice before publication, metadata only, file contents unchanged throughout: (1) author name normalization (Evgeniy Dolgov / sensus-stoa), (2) author email normalization to the sensus-stoa noreply address 284329574+sensus-stoa@users.noreply.github.com so GitHub attributes commits to sensus-stoa; personal and work emails were removed from public history at the same time. Pointers were re-locked after each rewrite without a re-run (criteria text byte-for-byte unchanged; claims.md sha256 at lock: 7bb5acdb27db33611e8c66c105454d546b291925847bfcbc473cfeacd736ab32). The v5 record was prepared in a fresh session after an independent review of v4; the review findings and their fixes are enumerated in trust/limitations.md (changelog from version 4)."
   },
+  "evidence_rules": "Evidence IDs (E-xx) are bound to a specific record version: the same E-ID in different record versions may denote different content. Content identity is the combination record_version + evidence_id + sha256. An ID whose content is reclassified is not reused with a new meaning: E-09 (src/pilot_calibration.py) was evidence in record versions 1-4 and is a disclosure (not evidence) in this version.",
   "evidence": [
-    {"id": "E-01", "type": "code", "path": "src/verdict_procedure.py", "sha256": "c2e9a6ecadab35a6660e7362945e28f1e689e1e126444f5226887571e9d6bf88", "role": "author-generated", "disclosure": "public", "note": "Audit battery (8 audits incl. timezone integrity) and verdict logic; frozen reason codes; audit-side availability map"},
-    {"id": "E-02", "type": "code", "path": "src/run_track_record.py", "sha256": "36e42d9a6dcc8858445572706211240fe42d36a23af25f6b5c9febecfea7c5af", "role": "author-generated", "disclosure": "public", "note": "Runner: per-case dataset dispatch, cases -> verdict -> results CSVs + NC-NULL loop"},
-    {"id": "E-03", "type": "code", "path": "src/case_api.py", "sha256": "2b6d483bf9319324337c85d6784b55ecc411f2cddd5cab34d595705dbed49353", "role": "author-generated", "disclosure": "public", "note": "Contract between a submitted case and the audit battery (incl. feature_frame_fn)"},
-    {"id": "E-04", "type": "code", "path": "src/metrics.py", "sha256": "8bd358c6c35ec4b5d8d21900a45de631f2e6bc9d9cc04e20385e8d56a9cc3b0e", "role": "author-generated", "disclosure": "public", "note": "MAE, cadence-aware baselines (lag 1/7 daily, 24/168 hourly), Wilson CI, block permutation surrogate"},
-    {"id": "E-05", "type": "code", "path": "src/linear_case.py", "sha256": "00ac4e488c64466c1e42fe92d784f3a0e45e82561765cdc3af44d553b97abeb2", "role": "author-generated", "disclosure": "public", "note": "Shared pipeline machinery (calendar + lag features, parameterised fit/eval)"},
-    {"id": "E-06", "type": "code", "path": "src/data_generator.py", "sha256": "6d9199d6ca80a6fb4e1e97987f67f60a1fde6414abbb6883798753789c990e18", "role": "author-generated", "disclosure": "public", "note": "Synthetic daily (seed 42) and hourly (seed 43, naive UTC) generators; define audit-side availability semantics"},
-    {"id": "E-07", "type": "code", "path": "src/clean_cases/clean_pipeline_01.py", "sha256": "f908fc9923592d5e11da86d1e5c84783e0504537db29c18e7a5679b4323dc756", "role": "author-generated", "disclosure": "public", "note": "Clean case C1: deployment-consistent day-ahead linear forecast"},
-    {"id": "E-08", "type": "code", "path": "src/defects/look_ahead_leak.py", "sha256": "fbea047fa5460825632332e9bed4470d3d23e69caa8ec0aa753403f6f28c8069", "role": "author-generated", "disclosure": "public", "note": "Defective case D1: planted look-ahead leak; identical to C1 except the leak"},
-    {"id": "E-09", "type": "code", "path": "src/pilot_calibration.py", "sha256": "a7c34f81308d7af9e34ee390325d40505201e3ce8ba36d11d3451089d53bdc13", "role": "author-generated", "disclosure": "public", "note": "Pre-lock calibration; not evidence, disclosed for honesty"},
-    {"id": "E-10", "type": "code", "path": "src/defects/backtest_contamination.py", "sha256": "4188c6750a223b2b8af2a7db32c598e1b1de58c0efebb02ec05af88a6202adb6", "role": "author-generated", "disclosure": "public", "note": "Defective case D3: planted backtest contamination (train overlaps test by 15 days)"},
-    {"id": "E-11", "type": "code", "path": "src/defects/target_leakage.py", "sha256": "c5a8ff79f887183ce32fd50a0866ac413cbfccf92bed7febe9101a2c2dd24aaa", "role": "author-generated", "disclosure": "public", "note": "Defective case D4: planted target leakage (load_settlement near-copy)"},
-    {"id": "E-12", "type": "code", "path": "src/clean_cases/clean_pipeline_02.py", "sha256": "d4c19ab0315dce608088671e4cd2351a491d303b942450c916e346436adfc0df", "role": "author-generated", "disclosure": "public", "note": "Clean case C2: scaled Ridge pipeline"},
-    {"id": "E-13", "type": "code", "path": "src/clean_cases/clean_pipeline_03.py", "sha256": "4f85d34cecc2bf71754ceab07fe34ddb63008f96552461de44fe3465403e1d8b", "role": "author-generated", "disclosure": "public", "note": "Clean case C3: gradient boosting pipeline (random_state=42)"},
-    {"id": "E-14", "type": "code", "path": "src/defects/dst_timezone.py", "sha256": "24c824201cd8dab1e882ff9982057ba52d2f20be12ea630602359285149b9222", "role": "author-generated", "disclosure": "public", "note": "Defective case D2: naive Berlin wall-time working frame + wall-clock lag grouping (hourly)"},
-    {"id": "E-15", "type": "code", "path": "src/clean_cases/clean_pipeline_04_hourly.py", "sha256": "92bf6a1797c633ebc69649a99667a8f92bc052c79b42ee79a732ea5aedf8703c", "role": "author-generated", "disclosure": "public", "note": "Clean case C4: timezone-aware hourly pipeline (UTC index preserved), twin of D2"},
-    {"id": "E-16", "type": "code", "path": "src/defects/cherry_picked_metric.py", "sha256": "634e950c81623fb91570cc80d2d2bd60f22109cfbf9b0ab74d522dcdde7641c4", "role": "author-generated", "disclosure": "public", "note": "Defective case D5: reported MAE on the 20 lowest-error days (silent trim)"},
-    {"id": "E-17", "type": "code", "path": "src/defects/selection_bias.py", "sha256": "6d8c0eb5d0fcc16f15cfeb5d24d91645cb01f8b07189957ffcf6418102b27db7", "role": "author-generated", "disclosure": "public", "note": "Defective case D6: best of K=20 noise-configurations selected on the test window (disclosed trial log)"},
-    {"id": "E-18", "type": "code", "path": "src/clean_cases/clean_pipeline_05_elastic_net.py", "sha256": "cca43fe6905f11c6ddca74ac1fea6f4a3a5be7930ab4ec45a5fa0a44e3d1e38e", "role": "author-generated", "disclosure": "public", "note": "Clean case C5: scaled ElasticNet pipeline"},
-    {"id": "E-19", "type": "dependencies", "path": "requirements.txt", "sha256": "c4eaac91ff312d25272c76a3200f71fa272336acfd9860e94b1f5debf8f0a4c5", "role": "author-generated", "disclosure": "public", "note": "numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1 (Python 3.11)"},
-    {"id": "E-20", "type": "dataset", "path": "data/synthetic/energy_daily.csv", "sha256": "032a14ceb78edca2a478ead2ce4eaeca371e1d8355eb7bf0ad0c298ff3939e25", "role": "author-generated", "disclosure": "public", "note": "425 days, seed 42; train [0,335), test [335,365), confirmation [365,425)"},
-    {"id": "E-21", "type": "dataset", "path": "data/synthetic/energy_hourly.csv", "sha256": "4de9c7338021888d661a986e90d589cd3c7839f9120abff0ee3e0b50b3297457", "role": "author-generated", "disclosure": "public", "note": "8760 hours of 2023, seed 43, naive UTC index (semantics: UTC); contains both Europe/Berlin DST transitions"},
-    {"id": "E-22", "type": "run-output", "path": "results/track_record.csv", "sha256": "b8a2e3e77f859190aff1c7095035f93f82b14abdbd094c65a4d17c81cc213c98", "role": "author-executed", "disclosure": "public", "note": "V-01 output: one row per case (N=1 each); regenerable byte-identically from E-01..E-18 + E-20/E-21"},
-    {"id": "E-23", "type": "run-output", "path": "results/null_control.csv", "sha256": "e50d78dc9114b18039a2c150aaa2f82031cc4ee2db52e84a70e15c75af43945e", "role": "author-executed", "disclosure": "public", "note": "V-02 output: NC-NULL, N=5 block-permutation runs (seeds 1..5)"},
-    {"id": "E-24", "type": "run-output", "path": "results/per_case/defect_01_look_ahead.json", "sha256": "0c29befa4f5ff15b3bff7894402293a85504d9798c76b87d93ab4b57cb577da6", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D1"},
-    {"id": "E-25", "type": "run-output", "path": "results/per_case/defect_02_dst_timezone.json", "sha256": "f0597b35ee77bfd6e6d43b7e562e07bf3908ca98141023342b6f0666d93ee40f", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D2"},
-    {"id": "E-26", "type": "run-output", "path": "results/per_case/defect_03_backtest_contamination.json", "sha256": "10a95e1d04081fd4e1177896a150756d303dd010d9ce4038e8198a92bffd502c", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D3"},
-    {"id": "E-27", "type": "run-output", "path": "results/per_case/defect_04_target_leakage.json", "sha256": "aa3e9dbc7c42c73d0d275ce420142386fdfab5aec867ada1eced3bbe1e7d674e", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D4"},
-    {"id": "E-28", "type": "run-output", "path": "results/per_case/defect_05_cherry_picked_metric.json", "sha256": "bc1eb694b8f5ac6054449eea406a99f93393e0d3ad1f776f8386beeb831efba4", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D5"},
-    {"id": "E-29", "type": "run-output", "path": "results/per_case/defect_06_selection_bias.json", "sha256": "11d7b76ec638f5dde111f11fa68db025f066dd81f7fe2284247210671f39aff2", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case D6"},
-    {"id": "E-30", "type": "run-output", "path": "results/per_case/clean_01_linear_forecast_features.json", "sha256": "030e669fc26538d3c7a9924d110973507108eae03de56cb980e6a563909a49e3", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C1"},
-    {"id": "E-31", "type": "run-output", "path": "results/per_case/clean_02_ridge_scaled.json", "sha256": "137f38ee4022d4bd4e86bd1557e41f7e7f51ab591324d190ab30079d4e2b4b07", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C2"},
-    {"id": "E-32", "type": "run-output", "path": "results/per_case/clean_03_gradient_boosting.json", "sha256": "523e20233581a9b6158e5aaef8aa63dd0e3ab40a074e4db25ed82587497598ed", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C3"},
-    {"id": "E-33", "type": "run-output", "path": "results/per_case/clean_04_hourly_tz_aware.json", "sha256": "88a98ec5bb70db52b428fd98cb72db57f9a6a35c52b153cf4b48d97b300476fe", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C4"},
-    {"id": "E-34", "type": "run-output", "path": "results/per_case/clean_05_elastic_net.json", "sha256": "f02affef9ab295cfa5a209e843eb8200190d98864fb1527d0ad671468e33dafa", "role": "author-executed", "disclosure": "public", "note": "Full audit detail, case C5"},
-    {"id": "E-35", "type": "summary", "path": "README.md", "sha256": "cd22602349f28f18e0b484f831907eb533d47197ea1760d72689d1ede07fd9b9", "role": "author-reported", "disclosure": "public", "note": "Description and results summary (editorial pass for external readers, internal project references removed); regenerated from E-01..E-34"}
+    {
+      "id": "E-01",
+      "type": "code",
+      "path": "src/verdict_procedure.py",
+      "sha256": "bb2a5ef11cc8c3a7165b2c7109aa1d8eee911c8904ccd27b8422afe6505aa523",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Audit battery (8 audits incl. timezone integrity and trial-disclosure replication) and verdict logic; frozen reason codes; audit-side availability map; LOOKAHEAD_GAP_THRESHOLD contract"
+    },
+    {
+      "id": "E-02",
+      "type": "code",
+      "path": "src/run_track_record.py",
+      "sha256": "482de4d21984f91747cec0122b3d91ddb9ed9f43127508f5127a2c23c5aa8bfd",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Runner: per-case dataset dispatch, cases -> verdict -> results CSVs + NC-NULL loop; --case partial-run semantics"
+    },
+    {
+      "id": "E-03",
+      "type": "code",
+      "path": "src/case_api.py",
+      "sha256": "2b6d483bf9319324337c85d6784b55ecc411f2cddd5cab34d595705dbed49353",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Contract between a submitted case and the audit battery (incl. feature_frame_fn)"
+    },
+    {
+      "id": "E-04",
+      "type": "code",
+      "path": "src/metrics.py",
+      "sha256": "295c132a0631d32a2fe40444a58db75c6de9b8fe700bbaecc4b5a4e1d2f59166",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "MAE, cadence-aware baselines (lag 1/7 daily, 24/168 hourly), Wilson CI, block permutation surrogate"
+    },
+    {
+      "id": "E-05",
+      "type": "code",
+      "path": "src/linear_case.py",
+      "sha256": "00ac4e488c64466c1e42fe92d784f3a0e45e82561765cdc3af44d553b97abeb2",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Shared pipeline machinery (calendar + lag features, parameterised fit/eval)"
+    },
+    {
+      "id": "E-06",
+      "type": "code",
+      "path": "src/data_generator.py",
+      "sha256": "06f1ede3fa809a6af2a5bfb814ba1e1f772e6f83dd50b362962c750d21933088",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Synthetic daily (seed 42) and hourly (seed 43, naive UTC) generators; window bounds; defines audit-side availability semantics"
+    },
+    {
+      "id": "E-07",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_01.py",
+      "sha256": "f908fc9923592d5e11da86d1e5c84783e0504537db29c18e7a5679b4323dc756",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C1: deployment-consistent day-ahead linear forecast"
+    },
+    {
+      "id": "E-08",
+      "type": "code",
+      "path": "src/defects/look_ahead_leak.py",
+      "sha256": "fbea047fa5460825632332e9bed4470d3d23e69caa8ec0aa753403f6f28c8069",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D1: planted look-ahead leak; identical to C1 except the leak"
+    },
+    {
+      "id": "E-10",
+      "type": "code",
+      "path": "src/defects/backtest_contamination.py",
+      "sha256": "4188c6750a223b2b8af2a7db32c598e1b1de58c0efebb02ec05af88a6202adb6",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D3: planted backtest contamination (train overlaps test by 15 days)"
+    },
+    {
+      "id": "E-11",
+      "type": "code",
+      "path": "src/defects/target_leakage.py",
+      "sha256": "c5a8ff79f887183ce32fd50a0866ac413cbfccf92bed7febe9101a2c2dd24aaa",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D4: planted target leakage (load_settlement near-copy)"
+    },
+    {
+      "id": "E-12",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_02.py",
+      "sha256": "d4c19ab0315dce608088671e4cd2351a491d303b942450c916e346436adfc0df",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C2: scaled Ridge pipeline"
+    },
+    {
+      "id": "E-13",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_03.py",
+      "sha256": "4f85d34cecc2bf71754ceab07fe34ddb63008f96552461de44fe3465403e1d8b",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C3: gradient boosting pipeline (random_state=42)"
+    },
+    {
+      "id": "E-14",
+      "type": "code",
+      "path": "src/defects/dst_timezone.py",
+      "sha256": "24c824201cd8dab1e882ff9982057ba52d2f20be12ea630602359285149b9222",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D2: naive Berlin wall-time working frame + wall-clock lag grouping (hourly)"
+    },
+    {
+      "id": "E-15",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_04_hourly.py",
+      "sha256": "92bf6a1797c633ebc69649a99667a8f92bc052c79b42ee79a732ea5aedf8703c",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C4: timezone-aware hourly pipeline (UTC index preserved), twin of D2"
+    },
+    {
+      "id": "E-16",
+      "type": "code",
+      "path": "src/defects/cherry_picked_metric.py",
+      "sha256": "634e950c81623fb91570cc80d2d2bd60f22109cfbf9b0ab74d522dcdde7641c4",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D5: reported MAE on the 20 lowest-error days of the 30-day window (silent trim)"
+    },
+    {
+      "id": "E-17",
+      "type": "code",
+      "path": "src/defects/selection_bias.py",
+      "sha256": "caa93c244ae1548b13b5a6d7252e528da388dcab3260a343797d714944643382",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D6: best of K=20 exchangeable noise configurations selected on the test window (disclosed trial log; per-configuration noise seeds)"
+    },
+    {
+      "id": "E-18",
+      "type": "code",
+      "path": "src/clean_cases/clean_pipeline_05_elastic_net.py",
+      "sha256": "cca43fe6905f11c6ddca74ac1fea6f4a3a5be7930ab4ec45a5fa0a44e3d1e38e",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Clean case C5: scaled ElasticNet pipeline"
+    },
+    {
+      "id": "E-19",
+      "type": "dependencies",
+      "path": "requirements.txt",
+      "sha256": "c4eaac91ff312d25272c76a3200f71fa272336acfd9860e94b1f5debf8f0a4c5",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1 (Python 3.11)"
+    },
+    {
+      "id": "E-20",
+      "type": "dataset",
+      "path": "data/synthetic/energy_daily.csv",
+      "sha256": "032a14ceb78edca2a478ead2ce4eaeca371e1d8355eb7bf0ad0c298ff3939e25",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "425 days (2023-01-01..2024-02-29), seed 42; train [0,335), test [335,365) = 30 rows, confirmation [365,425) = 60 rows"
+    },
+    {
+      "id": "E-21",
+      "type": "dataset",
+      "path": "data/synthetic/energy_hourly.csv",
+      "sha256": "4de9c7338021888d661a986e90d589cd3c7839f9120abff0ee3e0b50b3297457",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "8760 hours of 2023, seed 43, naive UTC index (semantics: UTC); contains both Europe/Berlin DST transitions"
+    },
+    {
+      "id": "E-22",
+      "type": "run-output",
+      "path": "results/track_record.csv",
+      "sha256": "7b34d3e083cd0a1f836fac2af4705d51223ec23790badf010c904925c318383b",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "V-01 output: one row per case (N=1 each); regenerable byte-identically from the code and dataset evidence"
+    },
+    {
+      "id": "E-23",
+      "type": "run-output",
+      "path": "results/null_control.csv",
+      "sha256": "43585d159f8f5df8dea5b40cbd9722e634c212294b82f4f48871c308f01deb36",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "V-02 output: NC-NULL, N=5 block-permutation runs (seeds 1..5) on the daily dataset"
+    },
+    {
+      "id": "E-24",
+      "type": "run-output",
+      "path": "results/per_case/defect_01_look_ahead.json",
+      "sha256": "0ed62be427996204067ea32f058829323b10a98e7c33c9e499ca31529dc87652",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D1"
+    },
+    {
+      "id": "E-25",
+      "type": "run-output",
+      "path": "results/per_case/defect_02_dst_timezone.json",
+      "sha256": "f48a181b60494d65c135cf2e50c1f4cb9474004da9e90d68ce012bf8088f0356",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D2"
+    },
+    {
+      "id": "E-26",
+      "type": "run-output",
+      "path": "results/per_case/defect_03_backtest_contamination.json",
+      "sha256": "d1d4ec670c6fb0ce2dd36b722ed22a8a7bd938dce8ecfaacb2fa0410cac8f414",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D3"
+    },
+    {
+      "id": "E-27",
+      "type": "run-output",
+      "path": "results/per_case/defect_04_target_leakage.json",
+      "sha256": "4c4e2cba626a120105b7c72ce8a00b6aca88591530c5b1b96a659af6a3af9c1b",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D4"
+    },
+    {
+      "id": "E-28",
+      "type": "run-output",
+      "path": "results/per_case/defect_05_cherry_picked_metric.json",
+      "sha256": "fff0a63ceb8ef10f3c901c80a6d08cc4ff13f75755685c16f9ac25c7928f0e6f",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D5"
+    },
+    {
+      "id": "E-29",
+      "type": "run-output",
+      "path": "results/per_case/defect_06_selection_bias.json",
+      "sha256": "cca28c7dee6600ec6976f72d416208ad15329e06c50880f2e6829c10155689bc",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D6 (trial-disclosure fail/NOISE on the fixed-baseline replication edge)"
+    },
+    {
+      "id": "E-30",
+      "type": "run-output",
+      "path": "results/per_case/clean_01_linear_forecast_features.json",
+      "sha256": "5995c1b16ec8839e602aa0a75543afaaa4f6a100fefb965daf74453983bd8b2d",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case C1"
+    },
+    {
+      "id": "E-31",
+      "type": "run-output",
+      "path": "results/per_case/clean_02_ridge_scaled.json",
+      "sha256": "c7102bd7833cfc389745f28704e6056b0e3d536070a135983d4143e71634ca9e",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case C2"
+    },
+    {
+      "id": "E-32",
+      "type": "run-output",
+      "path": "results/per_case/clean_03_gradient_boosting.json",
+      "sha256": "d7d4b0aa8dcca72f5a900f6192cf873c2ada2d65bdb4ffa7c68abd1c003199db",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case C3"
+    },
+    {
+      "id": "E-33",
+      "type": "run-output",
+      "path": "results/per_case/clean_04_hourly_tz_aware.json",
+      "sha256": "909b6404af52612096c2b7c9fee8d720341f0d02847d7cdcbc16816ce49838bc",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case C4"
+    },
+    {
+      "id": "E-34",
+      "type": "run-output",
+      "path": "results/per_case/clean_05_elastic_net.json",
+      "sha256": "f058d2d7097767d3f9947896bd1e465eb34d38a7a40380428b85cc2d09dbb8b7",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case C5"
+    },
+    {
+      "id": "E-35",
+      "type": "summary",
+      "path": "README.md",
+      "sha256": "2fa8f9b2b7877f1996fd8be0a331d36a5663110acc80ee572eb694801568dc90",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Description and results summary; regenerated from the code, dataset and run-output evidence"
+    },
+    {
+      "id": "E-36",
+      "type": "code",
+      "path": "src/defects/seasonal_naive_only.py",
+      "sha256": "4dca4f6242b42b7a96d73093106f53add7d2f01f8ed6eebacd1d979487dc974a",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D7: seasonal-naive baseline shipped as the forecast (passes the 6.0% gate, fails must-beat seasonal-naive)"
+    },
+    {
+      "id": "E-37",
+      "type": "code",
+      "path": "src/defects/search_overfit.py",
+      "sha256": "9da22066531aeab9f673511da347ccb8c1827bfa1942e6327d47fd4ab938bc28",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Defective case D8: best of K=20 configurations whose winner satisfies the pre-registered claim (caught solely by trial disclosure)"
+    },
+    {
+      "id": "E-38",
+      "type": "run-output",
+      "path": "results/per_case/defect_07_seasonal_naive_only.json",
+      "sha256": "c55b3aa8471a8caaddf1793273783fabf1900d2cac9ee822923ca3c109d8fda4",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D7"
+    },
+    {
+      "id": "E-39",
+      "type": "run-output",
+      "path": "results/per_case/defect_08_search_overfit.json",
+      "sha256": "9cbf9dd55d112861e8928602cdc34063e78722fd344e3443d377596229161705",
+      "role": "author-executed",
+      "disclosure": "public",
+      "note": "Full audit detail, case D8 (trial-disclosure fail/NOISE while claim conditions pass)"
+    },
+    {
+      "id": "E-40",
+      "type": "code",
+      "path": "tools/trust_check.py",
+      "sha256": "ad333c8e393346f28e708fe79d396768ae093f4f60539e0fdfb8f75b8ab913be",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Record consistency checker; generates trust_check_report.json (hash, xref, lock, sign-off-absent and path-hygiene checks)"
+    }
+  ],
+  "disclosures": [
+    {
+      "id": "E-09",
+      "type": "code",
+      "path": "src/pilot_calibration.py",
+      "sha256": "9f94d87cba43a0fa21cfdce5f4e2a7e19730f1a2b885f707001e2582b0448f35",
+      "role": "author-generated",
+      "disclosure": "public",
+      "note": "Pre-lock calibration script; NOT evidence: it was used to choose the claim thresholds before the criteria lock and is not part of the verification chain; disclosed for honesty. It was listed as evidence E-09 in record versions 1-4."
+    }
   ],
   "controls": [
     {
       "id": "NC-NULL",
-      "description": "Block permutation of the target series (7-day blocks, seeds 1..5): alignment between target and all exogenous/calendar features is destroyed; the clean pipeline is rebuilt and re-run on the permuted data; the verdict procedure must not issue PASS",
+      "description": "Block permutation of the target series (7-day blocks, seeds 1..5) of the DAILY dataset: alignment between target and all exogenous/calendar features is destroyed; the clean pipeline is rebuilt and re-run on the permuted data; the verdict procedure must not issue PASS",
       "N": 5,
       "rejections": 0,
       "rate": 0.0,
-      "wilson_ci_95": [0.0, 0.434],
-      "note": "rejections = false PASS on null data. Zero is published together with the Wilson CI and the conservative rule-of-three upper bound (~60% at 0/5). Naive point-shuffle of labels is not used (invalid on trended data; measured in V-PTM-001 claim C-04)"
+      "wilson_ci_95": [
+        0.0,
+        0.434
+      ],
+      "note": "rejections = false PASS on null data. Zero is published together with the Wilson CI and the conservative rule-of-three upper bound (~60% at 0/5). Naive point-shuffle of labels is not used anywhere in this record (invalid on trended data: it destroys the trend/seasonal structure and produces miscalibrated nulls)"
     }
   ],
   "disclosure_levels": {

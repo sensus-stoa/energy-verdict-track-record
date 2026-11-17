@@ -1,104 +1,334 @@
 {
   "schema": "trust-verdict/v3.5",
-  "verdict_id": "V-EVTR-004",
-  "date": "2026-11-15",
+  "verdict_id": "V-EVTR-005",
+  "date": "2026-11-17",
   "valid_until": "object-change",
-  "object_version": "a7ef54814c060a46b2260d68c69760bf1506babb",
+  "object_version": "124fc3232bb82a3c39f66703ba124804f1f94a92",
   "protocol_version": "CV0-TrustLayer-v3.5",
-  "executor": "Automated agent session (Hermes, 2026-11-15) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
-  "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-003, V-EVTR-002, V-EVTR-001; superseded verdicts remain in git history",
+  "executor": "Automated agent session (Hermes, 2026-11-17) running the deterministic commands from README, on behalf of Evgeniy Dolgov (author)",
+  "verifier": "Evgeniy Dolgov (author), PENDING human sign-off: this file is machine verification output; trust/signoff.md is intentionally absent (an agent never signs); independent reproduction: none yet, author-verification is not labeled independent. Supersedes V-EVTR-004, V-EVTR-003, V-EVTR-002, V-EVTR-001; superseded verdicts remain in git history",
   "claims": [
     {
       "id": "C-01",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_01_look_ahead (N=1 planted defective case)",
-      "evidence": ["E-01", "E-02", "E-08", "E-22", "E-24"],
-      "note": "Verdict FAIL, reason_code DATA. Structural: fitted model uses temp_actual, unavailable at inference. Deployment re-run MAE 1713.6 MW vs reported 1387.4 MW, relative gap 23.5% > 20% threshold"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-08",
+        "E-20",
+        "E-22",
+        "E-24"
+      ],
+      "note": "Verdict FAIL, reason_code DATA. Decisive audit: deployment_consistency. Structural: fitted model uses temp_actual, unavailable at inference. relative_gap = (deployment_mae - reported_mae) / reported_mae = (1699.3 - 1353.9) / 1353.9 = 25.5% > 20% threshold (impact confirmed)",
+      "case_verdict": "FAIL",
+      "case_reason_code": "DATA",
+      "failing_audits": [
+        "deployment_consistency"
+      ],
+      "inconclusive_audits": []
     },
     {
       "id": "C-02",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_01_linear_forecast_features (N=1 clean case)",
-      "evidence": ["E-01", "E-02", "E-07", "E-22", "E-30"],
-      "note": "Verdict PASS, all 8 audits ok. Recomputed MAE equals reported (1713.6 MW, diff 0.0). Claim holds: 3.19% of mean load 53701 MW <= 3.5%; beats persistence 2888 MW and seasonal-naive 3086 MW on the same 30-day window (N=1 window)"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-07",
+        "E-20",
+        "E-22",
+        "E-30"
+      ],
+      "note": "Verdict PASS, all 8 audits ok. Recomputed MAE equals reported (1699.3 MW, diff 0.0). Claim holds: 3.17% of mean load 53664.9 MW <= 3.5%; beats persistence 2726.9 MW and seasonal-naive 3157.3 MW on the same 30-row window (N=1 window)",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
     },
     {
       "id": "C-03",
       "status": "PASS",
       "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)",
-      "evidence": ["E-01", "E-02", "E-06", "E-23"],
-      "control": "NC-NULL",
-      "note": "False PASS 0/5 (N=5). Wilson 95% CI [0.000, 0.434]; conservative rule-of-three upper bound ~60%, stated next to the zero. MAE on null data 2318.2-2960.6 MW, all above the claim threshold 1879.5 MW"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-06",
+        "E-07",
+        "E-20",
+        "E-23"
+      ],
+      "note": "False PASS 0/5 (N=5). Wilson 95% CI [0.000, 0.434]; conservative rule-of-three upper bound ~60%, stated next to the zero. MAE on null data 2232.7-2925.2 MW, all above the claim threshold 1878.3 MW. Naive point-shuffle of labels is not used anywhere in this record (invalid on trended data)",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
     },
     {
       "id": "C-04",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_03_backtest_contamination (N=1 planted defective case)",
-      "evidence": ["E-01", "E-02", "E-10", "E-22", "E-26"],
-      "note": "Verdict FAIL, reason_code DATA. Train/test isolation audit flags the 15-day window overlap; reported MAE 1604.9 MW on contaminated backtest"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-10",
+        "E-20",
+        "E-22",
+        "E-26"
+      ],
+      "note": "Verdict FAIL, reason_code DATA. Decisive audit: train_test_isolation - flags the 15-day window overlap; reported MAE 1592.4 MW on contaminated backtest",
+      "case_verdict": "FAIL",
+      "case_reason_code": "DATA",
+      "failing_audits": [
+        "train_test_isolation"
+      ],
+      "inconclusive_audits": []
     },
     {
       "id": "C-05",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_04_target_leakage (N=1 planted defective case)",
-      "evidence": ["E-01", "E-02", "E-11", "E-22", "E-27"],
-      "note": "Verdict FAIL, reason_code DATA. Proximity audit flags load_settlement (corr 0.999 > 0.995); drop-test MAE 126.0 -> 1713.6 MW (collapse ratio 13.6 >= 2.0)"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-11",
+        "E-20",
+        "E-22",
+        "E-27"
+      ],
+      "note": "Verdict FAIL, reason_code DATA. Decisive audit: feature_target_proximity - flags load_settlement (corr 0.999 > 0.995); drop-test MAE 129.2 -> 1699.3 MW (collapse ratio 13.15 >= 2.0). deployment_consistency returns inconclusive (load_settlement is outside the audit availability map) - recorded, not hidden",
+      "case_verdict": "FAIL",
+      "case_reason_code": "DATA",
+      "failing_audits": [
+        "feature_target_proximity"
+      ],
+      "inconclusive_audits": [
+        "deployment_consistency"
+      ]
     },
     {
       "id": "C-06",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_02_ridge_scaled (N=1 clean case)",
-      "evidence": ["E-01", "E-02", "E-12", "E-22", "E-31"],
-      "note": "Verdict PASS, all 8 audits ok. MAE 1714.3 MW = 3.19% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-12",
+        "E-20",
+        "E-22",
+        "E-31"
+      ],
+      "note": "Verdict PASS, all 8 audits ok. MAE 1699.7 MW = 3.17% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
     },
     {
       "id": "C-07",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_03_gradient_boosting (N=1 clean case)",
-      "evidence": ["E-01", "E-02", "E-13", "E-22", "E-32"],
-      "note": "Verdict PASS, all 8 audits ok. MAE 1286.3 MW = 2.40% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-13",
+        "E-20",
+        "E-22",
+        "E-32"
+      ],
+      "note": "Verdict PASS, all 8 audits ok. MAE 1318.0 MW = 2.46% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
     },
     {
       "id": "C-08",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_02_dst_timezone (N=1 planted defective case, hourly data)",
-      "evidence": ["E-01", "E-02", "E-14", "E-21", "E-22", "E-25"],
-      "note": "Verdict FAIL, reason_code ENVIRONMENT. Timezone-integrity audit flags 1 duplicated wall-clock hour (2023-10-29 Europe/Berlin fall-back) in the working frame; reported MAE 107.4 MW barely differs from the clean twin 108.1 MW - defect invisible in the report"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-14",
+        "E-21",
+        "E-22",
+        "E-25"
+      ],
+      "note": "Verdict FAIL, reason_code ENVIRONMENT. Decisive audit: timezone_integrity - flags 1 duplicated wall-clock hour (2023-10-29 Europe/Berlin fall-back) in the working frame; reported MAE 107.4 MW barely differs from the clean twin 108.1 MW - defect invisible in the report",
+      "case_verdict": "FAIL",
+      "case_reason_code": "ENVIRONMENT",
+      "failing_audits": [
+        "timezone_integrity"
+      ],
+      "inconclusive_audits": []
     },
     {
       "id": "C-09",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_04_hourly_tz_aware (N=1 clean case, hourly data)",
-      "evidence": ["E-01", "E-02", "E-15", "E-21", "E-22", "E-33"],
-      "note": "Verdict PASS, all 8 audits ok. MAE 108.1 MW = 4.39% of mean hourly load 2461 MW <= 6.0%; beats hourly persistence 184 MW (lag24) and seasonal-naive 136 MW (lag168) on the same 168-hour window"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-15",
+        "E-21",
+        "E-22",
+        "E-33"
+      ],
+      "note": "Verdict PASS, all 8 audits ok. MAE 108.1 MW = 4.39% of mean hourly load 2460.7 MW <= 6.0%; beats hourly persistence 183.9 MW (lag24) and seasonal-naive 135.9 MW (lag168) on the same 168-row window. The 6.0% threshold is an upper bound on error; skill comes from the must-beat conditions (see C-13)",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
     },
     {
       "id": "C-10",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_05_cherry_picked_metric (N=1 planted defective case)",
-      "evidence": ["E-01", "E-02", "E-16", "E-22", "E-28"],
-      "note": "Verdict FAIL, reason_code CONFLICT_EVIDENCE. Metric-reproduction audit: reported MAE 996.5 MW (20 lowest-error days) vs recomputed full-window 1713.6 MW, relative diff 72.0% > 1% tolerance"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-16",
+        "E-20",
+        "E-22",
+        "E-28"
+      ],
+      "note": "Verdict FAIL, reason_code CONFLICT_EVIDENCE. Decisive audit: metric_reproduction - reported MAE 996.5 MW (20 lowest-error days) vs recomputed full-window 1699.3 MW, relative diff 70.53% > 1% tolerance",
+      "case_verdict": "FAIL",
+      "case_reason_code": "CONFLICT_EVIDENCE",
+      "failing_audits": [
+        "metric_reproduction"
+      ],
+      "inconclusive_audits": []
     },
     {
       "id": "C-11",
       "status": "PASS",
       "verification": "V-01: run_track_record, case defect_06_selection_bias (N=1 planted defective case, K=20 disclosed trial log)",
-      "evidence": ["E-01", "E-02", "E-17", "E-22", "E-29"],
-      "note": "Verdict FAIL, reason_code NOISE. Reported best-of-20 MAE 2607.8 MW fails the pre-registered claim (threshold 1880 MW); configurations carry no exogenous skill by construction - the selection artifact cannot produce a genuine edge"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-17",
+        "E-20",
+        "E-22",
+        "E-29"
+      ],
+      "note": "Verdict FAIL, reason_code NOISE. Two audits fail: (a) claim_conditions - reported best-of-20 MAE 2519.0 MW exceeds the pre-registered threshold 1878.3 MW (3.5% of mean load 53664.9 MW); (b) trial_disclosure - the winner's selection gain over the fixed unsearched baseline (intersection of all disclosed trial feature sets; test MAE 2683.4 MW) is 6.1% on test and does not replicate on the confirmation window (-1.3%); the seasonal-naive edge (20.2% -> 26.4%) replicates and is not the decisive edge. The v4 version of this audit returned ok here - a bug fixed in v5 (see limitations). deployment_consistency returns inconclusive (noise columns outside the audit availability map) - recorded, not hidden",
+      "case_verdict": "FAIL",
+      "case_reason_code": "NOISE",
+      "failing_audits": [
+        "claim_conditions",
+        "trial_disclosure"
+      ],
+      "inconclusive_audits": [
+        "deployment_consistency"
+      ]
     },
     {
       "id": "C-12",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_05_elastic_net (N=1 clean case)",
-      "evidence": ["E-01", "E-02", "E-18", "E-22", "E-34"],
-      "note": "Verdict PASS, all 8 audits ok. MAE 1726.7 MW = 3.21% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window"
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-18",
+        "E-20",
+        "E-22",
+        "E-34"
+      ],
+      "note": "Verdict PASS, all 8 audits ok. MAE 1708.4 MW = 3.18% of mean load <= 3.5%; beats persistence and seasonal-naive on the same window",
+      "case_verdict": "PASS",
+      "case_reason_code": "",
+      "failing_audits": [],
+      "inconclusive_audits": []
+    },
+    {
+      "id": "C-13",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_07_seasonal_naive_only (N=1 planted defective case, hourly data)",
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-36",
+        "E-21",
+        "E-22",
+        "E-38"
+      ],
+      "note": "Verdict FAIL, reason_code NOISE. Decisive audit: claim_conditions, must-beat condition - the prediction IS the seasonal-naive baseline (168h lag, disclosed), so it is not better than seasonal-naive (135.9 vs 135.9 MW) while satisfying the absolute gate (5.52% <= 6.0% of mean load 2460.7 MW; threshold 147.6 MW). Demonstrates that the hourly 6% threshold is an upper bound on error, not a skill criterion; new in v5",
+      "case_verdict": "FAIL",
+      "case_reason_code": "NOISE",
+      "failing_audits": [
+        "claim_conditions"
+      ],
+      "inconclusive_audits": []
+    },
+    {
+      "id": "C-14",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_08_search_overfit (N=1 planted defective case, K=20 disclosed trial log)",
+      "evidence": [
+        "E-01",
+        "E-02",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-37",
+        "E-20",
+        "E-22",
+        "E-39"
+      ],
+      "note": "Verdict FAIL, reason_code NOISE. Decisive audit: trial_disclosure (the ONLY failing audit) - the winner satisfies the pre-registered claim on the test window (1617.4 MW = 3.01% <= 3.5%; beats persistence 2726.9 MW and seasonal-naive 3157.3 MW), so claim_conditions returns ok; the selection gain over the fixed unsearched base configuration (test MAE 1699.3 MW) is 4.8% on test and does not replicate on the confirmation window (-5.0%). Demonstrates audit #8 working independently of audit #7; new in v5. deployment_consistency returns inconclusive (noise columns outside the audit availability map) - recorded, not hidden",
+      "case_verdict": "FAIL",
+      "case_reason_code": "NOISE",
+      "failing_audits": [
+        "trial_disclosure"
+      ],
+      "inconclusive_audits": [
+        "deployment_consistency"
+      ]
     }
   ],
   "properties_separate": {
-    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit a7ef54814c060a46b2260d68c69760bf1506babb; criteria locked at 6858f2ee338c3714ded45ce9ec8f8cf1b7b1fef3 (C-01..C-12 text unchanged from v3 lock 4e9cb212cb3578249f5019b17662d0bac487e053; editorial scope-paragraph change only; branch rewritten twice before publication for author-identity and email normalization, file contents unchanged)",
+    "integrity": "sha256 per evidence item in evidence-manifest.json; verified object pinned by commit 124fc3232bb82a3c39f66703ba124804f1f94a92; criteria locked at 74f2a46a363f7b83481b8fc22400d17dda954dab (claims.md sha256 at lock: 7bb5acdb27db33611e8c66c105454d546b291925847bfcbc473cfeacd736ab32); v5 is a new record version prepared after an independent review of v4 found real defects (trial-disclosure logic, AuditResult serialization, window bounds, unused gap threshold); the review findings and fixes are enumerated in trust/limitations.md",
     "provenance": "author-generated / author-executed / author-reported (public self-audit, no client); AI assistance in building and running the procedure is disclosed in README and trust/limitations.md",
     "reproducibility": "V-01/V-02 deterministic (daily seed 42, hourly seed 43, null seeds 1..5): re-running the committed commands on the committed data must reproduce every number byte-identically; independent reproduction: none",
-    "validity": "Valid for the synthetic energy domains defined by src/data_generator.py (single city profile, daily and hourly, no holidays, no price effects). NOT evidence about real production pipelines. Start-set coverage: 6 defective + 5 clean cases across the daily and hourly synthetic domains"
+    "validity": "Valid for the synthetic energy domains defined by src/data_generator.py (single city profile, daily and hourly, no holidays, no price effects). NOT evidence about real production pipelines. Start-set coverage: 8 defective + 5 clean cases across the daily and hourly synthetic domains"
   },
   "negative_controls": [
     {
@@ -106,8 +336,11 @@
       "N": 5,
       "rejections": 0,
       "rate": 0.0,
-      "wilson_ci_95": [0.0, 0.434],
-      "note": "rejections = false PASS on destroyed-alignment data; zero published with Wilson CI and rule-of-three bound (~60%); naive point-shuffle not used (V-PTM-001 C-04)"
+      "wilson_ci_95": [
+        0.0,
+        0.434
+      ],
+      "note": "rejections = false PASS on destroyed-alignment data; zero published with Wilson CI and rule-of-three bound (~60%); naive point-shuffle of labels not used anywhere in this record (invalid on trended data)"
     }
   ]
 }
