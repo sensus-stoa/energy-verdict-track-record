@@ -1,8 +1,9 @@
 {
   "tool": "trust_check",
-  "version": "0.1.0",
-  "checked_at": "2026-11-15T18:40:19Z",
-  "root": "/home/ninjacat/Desktop/refusal/energy-verdict-track-record",
+  "version": "0.2.0",
+  "checked_at": "2026-11-17T13:29:39Z",
+  "root": ".",
+  "checked_commit": "d60d760ef0b282b26953327e323e46a847c7996b",
   "overall": "PASS",
   "claims": [
     {
@@ -18,8 +19,7 @@
     {
       "id": "C-03",
       "status": "PASS",
-      "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)",
-      "control": "NC-NULL"
+      "verification": "V-02: run_track_record --with-null-control (N=5 block-permutation runs, seeds 1..5)"
     },
     {
       "id": "C-04",
@@ -65,6 +65,16 @@
       "id": "C-12",
       "status": "PASS",
       "verification": "V-01: run_track_record, case clean_05_elastic_net (N=1 clean case)"
+    },
+    {
+      "id": "C-13",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_07_seasonal_naive_only (N=1 planted defective case, hourly data)"
+    },
+    {
+      "id": "C-14",
+      "status": "PASS",
+      "verification": "V-01: run_track_record, case defect_08_search_overfit (N=1 planted defective case, K=20 disclosed trial log)"
     }
   ],
   "checks": [
@@ -81,22 +91,22 @@
     {
       "id": "HASHES_MATCH",
       "status": "PASS",
-      "detail": "35 hashed artifacts verified"
+      "detail": "40 hashed artifacts verified (39 evidence + 1 disclosures)"
     },
     {
       "id": "CLAIMS_XREF",
       "status": "PASS",
-      "detail": "all 12 claim ids present in claims.md"
+      "detail": "all 14 claim ids present in claims.md"
     },
     {
       "id": "EVIDENCE_XREF",
       "status": "PASS",
-      "detail": "all evidence references resolve to manifest entries"
+      "detail": "all evidence references resolve to manifest evidence entries"
     },
     {
       "id": "CONTROLS",
       "status": "PASS",
-      "detail": "controls sound for 12 PASS claims"
+      "detail": "controls sound for 14 PASS claims"
     },
     {
       "id": "REASON_CODES",
@@ -111,12 +121,27 @@
     {
       "id": "LOCK_BLOB",
       "status": "PASS",
-      "detail": "locked trust/claims.md non-empty (10336 bytes at 6858f2ee338c...)"
+      "detail": "locked trust/claims.md non-empty (16294 bytes at 74f2a46...)"
     },
     {
       "id": "LOCK_ANCESTOR",
       "status": "PASS",
-      "detail": "6858f2ee338c... is an ancestor of HEAD"
+      "detail": "74f2a46... is an ancestor of HEAD"
+    },
+    {
+      "id": "OBJECT_PIN",
+      "status": "PASS",
+      "detail": "all evidence hashes match the tree at object.commit 124fc32..."
+    },
+    {
+      "id": "SIGNOFF_ABSENT",
+      "status": "PASS",
+      "detail": "trust/signoff.md does not exist (an agent never signs)"
+    },
+    {
+      "id": "PATH_HYGIENE",
+      "status": "PASS",
+      "detail": "no local machine paths or personal emails in the public record files"
     }
   ]
 }
