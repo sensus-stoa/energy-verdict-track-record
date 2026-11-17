@@ -1,8 +1,9 @@
 {
   "tool": "trust_check",
-  "version": "0.1.0",
-  "checked_at": "2026-11-17T13:39:54Z",
+  "version": "0.2.0",
+  "checked_at": "2026-11-17T15:39:31Z",
   "root": ".",
+  "checked_commit": "a5fd4bfeb5268629484690f7174d0fb1aadb6b33",
   "overall": "PASS",
   "claims": [
     {
@@ -91,7 +92,7 @@
     {
       "id": "HASHES_MATCH",
       "status": "PASS",
-      "detail": "38 hashed artifacts verified"
+      "detail": "39 hashed artifacts verified (38 evidence + 1 disclosures)"
     },
     {
       "id": "CLAIMS_XREF",
@@ -119,6 +120,46 @@
       "detail": "valid_until: object-change"
     },
     {
+      "id": "AUDIT_SHAPE",
+      "status": "PASS",
+      "detail": "13 run-output audit report(s) satisfy the serialization contract"
+    },
+    {
+      "id": "AUDIT_DECISION_XREF",
+      "status": "PASS",
+      "detail": "decision metadata of 13 claim(s) matches the run-output audit reports"
+    },
+    {
+      "id": "CLAIM_PROMISE",
+      "status": "SKIP",
+      "detail": "claims.md declares no 'Promise:' lines (optional pre-run audit promises)"
+    },
+    {
+      "id": "REQUIRED_METRICS",
+      "status": "SKIP",
+      "detail": "manifest declares no audit_metrics_contract"
+    },
+    {
+      "id": "EVIDENCE_SECTION",
+      "status": "PASS",
+      "detail": "1 disclosure item(s) kept outside the evidence chain"
+    },
+    {
+      "id": "EXTERNAL_REF_WHITELIST",
+      "status": "PASS",
+      "detail": "all record references resolve within the record (own id, supersedes chain, ranges, whitelist)"
+    },
+    {
+      "id": "PATH_HYGIENE",
+      "status": "PASS",
+      "detail": "no machine-local paths or personal emails in the record files"
+    },
+    {
+      "id": "VERSION_CONSISTENCY",
+      "status": "PASS",
+      "detail": "limitations.md states \"record version 5\", matching verdict_id \"V-EVTR-005\""
+    },
+    {
       "id": "LOCK_BLOB",
       "status": "PASS",
       "detail": "locked trust/claims.md non-empty (16294 bytes at 74f2a46a363f...)"
@@ -127,6 +168,16 @@
       "id": "LOCK_ANCESTOR",
       "status": "PASS",
       "detail": "74f2a46a363f... is an ancestor of HEAD"
+    },
+    {
+      "id": "LOCK_FIDELITY",
+      "status": "PASS",
+      "detail": "trust/claims.md is byte-identical to the criteria-lock commit (74f2a46a363f...)"
+    },
+    {
+      "id": "OBJECT_REACHABLE",
+      "status": "PASS",
+      "detail": "bf73219448ae... is present in this repository"
     }
   ]
 }
