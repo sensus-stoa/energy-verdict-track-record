@@ -7,11 +7,16 @@ Generates data/synthetic/energy_daily.csv:
     temp_forecast   day-ahead temperature forecast, deg C (available at 00:00 of the day)
     load            daily electricity load, MW
 
-Windows (fixed by design, see README):
+Windows (fixed by design, see README), row counts aligned with the 425-day
+dataset so that train = [0, 335), test = [335, 365) (30 days),
+confirmation = [365, 425) (60 days, 2024 is a leap year):
+
     train         [0, 335)   2023-01-01 .. 2023-12-01
-    test          [335, 365) 2023-12-02 .. 2024-01-01  (primary evaluation window)
-    confirmation  [365, 425) 2024-01-02 .. 2024-03-01  (held out; used only by the
-                  selection-bias replication audit, never by pipelines)
+    test          [335, 365) 2023-12-02 .. 2023-12-31  (primary evaluation
+                  window, 30 rows)
+    confirmation  [365, 425) 2024-01-01 .. 2024-02-29  (held out; used only
+                  by the selection-bias replication audit, never by
+                  pipelines, 60 rows)
 
 Generator semantics are the AUDIT-SIDE ground truth for feature availability:
 temp_actual is NOT available at inference time (it materialises at the end of
@@ -84,11 +89,15 @@ def load_or_generate(path: Path = DEFAULT_CSV) -> pd.DataFrame:
 
 
 def windows() -> dict:
-    """Fixed evaluation windows (see module docstring)."""
+    """Fixed evaluation windows (see module docstring).
+
+    Half-open [start, end) label bounds; row counts: train 335, test 30,
+    confirmation 60 (dataset has 425 rows, 2023-01-01 .. 2024-02-29).
+    """
     return {
-        "train": ("2023-01-01", "2023-12-02"),   # [start, end)
-        "test": ("2023-12-02", "2024-01-02"),
-        "confirmation": ("2024-01-02", "2024-03-02"),
+        "train": ("2023-01-01", "2023-12-02"),    # [0, 335)
+        "test": ("2023-12-02", "2024-01-01"),     # [335, 365) = 30 rows
+        "confirmation": ("2024-01-01", "2024-03-01"),  # [365, 425) = 60 rows
     }
 
 

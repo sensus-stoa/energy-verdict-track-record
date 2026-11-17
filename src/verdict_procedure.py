@@ -17,7 +17,14 @@ The procedure trusts nothing the case self-reports about data semantics:
 - skill claims must hold against pre-registered baselines
   (persistence, seasonal-naive);
 - multi-configuration searches (K > 1) must replicate on the held-out
-  confirmation window, otherwise the claimed edge is classified as noise.
+  confirmation window - both the improvement over the seasonal-naive
+  baseline and the selection gain over the fixed unsearched baseline (the
+  largest feature set common to all disclosed trial configurations) -,
+  otherwise the claimed edge is classified as noise;
+- a relative deployment MAE gap above LOOKAHEAD_GAP_THRESHOLD (20%),
+  relative_gap = (deployment_mae - reported_mae) / reported_mae, documents
+  the impact of a look-ahead leak (using an unavailable feature is itself
+  the violation and fails the audit regardless of the gap).
 """
 
 from __future__ import annotations
@@ -89,13 +96,19 @@ def audit_prediction_alignment(data, art: CaseArtifact, cfg: AuditConfig) -> Aud
     preds = art.predictions
     missing = expected.difference(preds.index)
     extra = preds.index.difference(expected)
-    if len(missing) or len(extra) or not np.isfinite(preds.to_numpy()).all():
+    # set difference above does not see duplicated timestamps (a duplicated
+    # prediction index still covers the window); check duplicates explicitly
+    dup_preds = int(preds.index.duplicated().sum())
+    if len(missing) or len(extra) or dup_preds or not np.isfinite(preds.to_numpy()).all():
         return AuditResult(
-            "prediction_alignment", "inconclusive", "DATA",
-            f"predictions do not cover the test window exactly: missing={len(missing)} "
-            f"extra={len(extra)} nonfinite={int((~np.isfinite(preds.to_numpy())).sum())} (N=1 case)",
+            name="prediction_alignment", status="inconclusive", reason_code="DATA",
+            detail=f"predictions do not cover the test window exactly: missing={len(missing)} "
+                   f"extra={len(extra)} duplicated={dup_preds} "
+                   f"nonfinite={int((~np.isfinite(preds.to_numpy())).sum())} (N=1 case)",
+            metrics={},
         )
-    return AuditResult("prediction_alignment", "ok",
+    return AuditResult(name="prediction_alignment", status="ok", reason_code="",
+                       detail="predictions cover the pre-registered test window exactly",
                        metrics={"n_test_rows": int(len(expected))})
 
 
@@ -121,30 +134,45 @@ def audit_deployment_consistency(data, art: CaseArtifact, cfg: AuditConfig) -> A
     unknown = [f for f in used if f not in cfg.availability]
     if unknown:
         return AuditResult(
-            "deployment_consistency", "inconclusive", "DATA",
-            f"feature availability unknown to the audit for: {unknown} (N=1 case)",
+            name="deployment_consistency", status="inconclusive", reason_code="DATA",
+            detail=f"feature availability unknown to the audit for: {unknown} (N=1 case)",
+            metrics={},
         )
     unavailable_used = [f for f in used if not cfg.availability[f]]
-    metrics = {"unavailable_features_used": unavailable_used}
     if unavailable_used:
-        # Structural finding already decisive; quantify the impact anyway.
+        # The structural finding is decisive on its own: fitting on features that
+        # are not available at inference time IS the look-ahead violation,
+        # whatever the measured gap. The gap against
+        # cfg.lookahead_gap_threshold documents the deployment impact:
+        # relative_gap = (deployment_mae - reported_mae) / reported_mae
+        # (denominator: the reported MAE on the pre-registered test window).
         safe = [f for f in used if cfg.availability[f]]
+        metrics = {"unavailable_features_used": unavailable_used,
+                   "lookahead_gap_threshold": cfg.lookahead_gap_threshold}
         if safe:
             _, mae_d = art.retrain_eval_fn(data, safe, art.windows.train, art.windows.test)
             gap = (mae_d - art.reported_mae) / art.reported_mae if art.reported_mae else float("inf")
             metrics["deployment_mae"] = round(mae_d, 1)
-            metrics["relative_gap"] = round(gap, 3)
-            detail = (
-                f"look-ahead leak: model uses features not available at inference time "
-                f"({unavailable_used}); re-run with deployment-realistic features gives "
-                f"MAE {mae_d:.0f} vs reported {art.reported_mae:.0f} (gap {gap:.1%}, N=1 retrain)"
-            )
+            metrics["relative_gap"] = round(gap, 4)
+            metrics["gap_exceeds_threshold"] = bool(gap > cfg.lookahead_gap_threshold)
+            gap_txt = (f"relative gap (deployment_mae - reported_mae) / reported_mae = "
+                       f"{gap:.1%} vs threshold {cfg.lookahead_gap_threshold:.0%}")
+            if gap > cfg.lookahead_gap_threshold:
+                impact = (f"deployment re-run MAE {mae_d:.0f} vs reported "
+                          f"{art.reported_mae:.0f}: {gap_txt} - impact above threshold")
+            else:
+                impact = (f"deployment re-run MAE {mae_d:.0f} vs reported "
+                          f"{art.reported_mae:.0f}: {gap_txt}, below threshold; the fail "
+                          f"rests on the structural use of unavailable features")
+            detail = (f"look-ahead leak: model uses features not available at inference "
+                      f"time ({unavailable_used}); {impact} (N=1 retrain)")
         else:
-            gap = float("inf")
             detail = (f"look-ahead leak: ALL used features are unavailable at inference "
-                      f"({unavailable_used})")
-        return AuditResult("deployment_consistency", "fail", "DATA", detail, metrics)
-    return AuditResult("deployment_consistency", "ok",
+                      f"time ({unavailable_used})")
+        return AuditResult(name="deployment_consistency", status="fail", reason_code="DATA",
+                           detail=detail, metrics=metrics)
+    return AuditResult(name="deployment_consistency", status="ok", reason_code="",
+                       detail=f"all {len(used)} used features available at inference time",
                        metrics={"n_features": len(used)})
 
 
@@ -166,30 +194,32 @@ def audit_feature_target_proximity(data, art: CaseArtifact, cfg: AuditConfig) ->
             suspects.append((f, corr))
     metrics = {"suspects": [(f, round(c, 4)) for f, c in suspects]}
     if not suspects:
-        return AuditResult("feature_target_proximity", "ok", metrics=metrics)
+        return AuditResult(name="feature_target_proximity", status="ok", reason_code="",
+                           detail="no feature is a near-copy of the target", metrics=metrics)
     # Drop-test: remove ALL suspect features at once, retrain, re-evaluate.
     safe = [f for f in art.feature_names_used if f not in {s for s, _ in suspects}]
     if not safe:
-        return AuditResult("feature_target_proximity", "fail", "DATA",
-                           f"target leakage: every used feature is a near-copy of the target "
-                           f"({suspects}); nothing left to retrain with (N=1 drop-test)", metrics)
+        return AuditResult(name="feature_target_proximity", status="fail", reason_code="DATA",
+                           detail=f"target leakage: every used feature is a near-copy of the target "
+                                  f"({suspects}); nothing left to retrain with (N=1 drop-test)",
+                           metrics=metrics)
     _, mae_drop = art.retrain_eval_fn(data, safe, art.windows.train, art.windows.test)
     ratio = mae_drop / art.reported_mae if art.reported_mae else float("inf")
     metrics["mae_without_suspects"] = round(mae_drop, 1)
     metrics["collapse_ratio"] = round(ratio, 2)
     if ratio >= cfg.leak_collapse_ratio:
         return AuditResult(
-            "feature_target_proximity", "fail", "DATA",
-            f"target leakage: features {suspects} are near-copies of the target "
-            f"(|corr| > {cfg.leak_corr_threshold}); without them MAE grows "
-            f"{ratio:.1f}x ({art.reported_mae:.0f} -> {mae_drop:.0f}), N=1 drop-test",
-            metrics,
+            name="feature_target_proximity", status="fail", reason_code="DATA",
+            detail=f"target leakage: features {suspects} are near-copies of the target "
+                   f"(|corr| > {cfg.leak_corr_threshold}); without them MAE grows "
+                   f"{ratio:.1f}x ({art.reported_mae:.0f} -> {mae_drop:.0f}), N=1 drop-test",
+            metrics=metrics,
         )
     return AuditResult(
-        "feature_target_proximity", "ok",
-        f"near-target features present but performance does not collapse without them "
-        f"({ratio:.2f}x < {cfg.leak_collapse_ratio}x); not classified as leakage",
-        metrics,
+        name="feature_target_proximity", status="ok", reason_code="",
+        detail=f"near-target features present but performance does not collapse without them "
+               f"({ratio:.2f}x < {cfg.leak_collapse_ratio}x); not classified as leakage",
+        metrics=metrics,
     )
 
 
@@ -205,15 +235,16 @@ def audit_metric_reproduction(data, art: CaseArtifact, cfg: AuditConfig) -> Audi
                "relative_diff": round(rel, 5)}
     if rel > cfg.metric_tolerance:
         return AuditResult(
-            "metric_reproduction", "fail", "CONFLICT_EVIDENCE",
-            f"reported MAE {art.reported_mae:.1f} does not reproduce from returned "
-            f"predictions on the full test window ({recomputed:.1f}, diff {rel:.2%} "
-            f"> {cfg.metric_tolerance:.0%}); reported number not reproducible as stated "
-            f"(N=1 recomputation)", metrics,
+            name="metric_reproduction", status="fail", reason_code="CONFLICT_EVIDENCE",
+            detail=f"reported MAE {art.reported_mae:.1f} does not reproduce from returned "
+                   f"predictions on the full test window ({recomputed:.1f}, diff {rel:.2%} "
+                   f"> {cfg.metric_tolerance:.0%}); reported number not reproducible as stated "
+                   f"(N=1 recomputation)",
+            metrics=metrics,
         )
-    return AuditResult("metric_reproduction", "ok",
-                       f"reported MAE reproduces from predictions (diff {rel:.4%})",
-                       metrics)
+    return AuditResult(name="metric_reproduction", status="ok", reason_code="",
+                       detail=f"reported MAE reproduces from predictions (diff {rel:.4%})",
+                       metrics=metrics)
 
 
 def audit_claim_conditions(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
@@ -241,13 +272,15 @@ def audit_claim_conditions(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
         failures.append(f"MAE {recomputed:.0f} not better than persistence {mae_p:.0f}")
     if failures:
         return AuditResult(
-            "claim_conditions", "fail", "NOISE",
-            "claimed performance does not hold: " + "; ".join(failures) +
-            " (N=1 test window, baselines computed on the same window)", metrics,
+            name="claim_conditions", status="fail", reason_code="NOISE",
+            detail="claimed performance does not hold: " + "; ".join(failures) +
+                   " (N=1 test window, baselines computed on the same window)",
+            metrics=metrics,
         )
-    return AuditResult("claim_conditions", "ok",
-                       f"claim holds: MAE {recomputed:.0f} <= {threshold:.0f}; "
-                       f"beats persistence {mae_p:.0f} and seasonal-naive {mae_s:.0f}", metrics)
+    return AuditResult(name="claim_conditions", status="ok", reason_code="",
+                       detail=f"claim holds: MAE {recomputed:.0f} <= {threshold:.0f}; "
+                              f"beats persistence {mae_p:.0f} and seasonal-naive {mae_s:.0f}",
+                       metrics=metrics)
 
 
 def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
@@ -255,8 +288,8 @@ def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
     k = len(log)
     if k <= 1:
         return AuditResult(
-            "trial_disclosure", "ok",
-            f"single pre-registered configuration (K=1); no multiplicity correction needed",
+            name="trial_disclosure", status="ok", reason_code="",
+            detail="single pre-registered configuration (K=1); no multiplicity correction needed",
             metrics={"K": k},
         )
     best = min(log, key=lambda e: e["test_mae"])
@@ -269,21 +302,77 @@ def audit_trial_disclosure(data, art: CaseArtifact, cfg: AuditConfig) -> AuditRe
     imp_conf = (naive_conf - mae_c) / naive_conf
     metrics = {"K": k, "best_test_mae": round(best["test_mae"], 1),
                "confirmation_mae": round(mae_c, 1),
+               "seasonal_naive_test_mae": round(naive_test, 1),
+               "seasonal_naive_confirmation_mae": round(naive_conf, 1),
                "improvement_test": round(imp_test, 4),
-               "improvement_confirmation": round(imp_conf, 4)}
+               "improvement_confirmation": round(imp_conf, 4),
+               "min_improvement_for_replication": cfg.min_improvement_for_replication}
+    failures = []
     if imp_test > cfg.min_improvement_for_replication and imp_conf <= 0:
+        failures.append(
+            f"improvement over seasonal-naive does not replicate on the confirmation "
+            f"window ({imp_test:.1%} test -> {imp_conf:.1%} confirmation <= 0)")
+
+    # Fixed, unsearched baseline: the largest feature set common to ALL disclosed
+    # trial configurations (their intersection). Nobody selected it on the test
+    # window, so the best-of-K winner's gain over it measures the pure selection
+    # (multiple-comparison) effect. Comparing only against seasonal-naive is not
+    # enough: a searched configuration can beat a weak cadence baseline on BOTH
+    # windows while its edge over the unsearched configuration is pure noise.
+    common = set(log[0]["features"])
+    for entry in log[1:]:
+        common &= set(entry["features"])
+    fixed_features = [f for f in log[0]["features"] if f in common]
+    if fixed_features:
+        _, mae_fixed_test = art.retrain_eval_fn(data, fixed_features,
+                                                art.windows.train, art.windows.test)
+        _, mae_fixed_conf = art.retrain_eval_fn(data, fixed_features,
+                                                art.windows.train, art.windows.confirmation)
+        gain_test = ((mae_fixed_test - best["test_mae"]) / mae_fixed_test
+                     if mae_fixed_test else float("inf"))
+        gain_conf = ((mae_fixed_conf - mae_c) / mae_fixed_conf
+                     if mae_fixed_conf else float("inf"))
+        metrics["fixed_baseline_features"] = fixed_features
+        metrics["fixed_baseline_test_mae"] = round(mae_fixed_test, 1)
+        metrics["fixed_baseline_confirmation_mae"] = round(mae_fixed_conf, 1)
+        metrics["selection_gain_test"] = round(gain_test, 4)
+        metrics["selection_gain_confirmation"] = round(gain_conf, 4)
+        if gain_test > cfg.min_improvement_for_replication and gain_conf <= 0:
+            failures.append(
+                f"selection gain over the fixed unsearched baseline does not replicate "
+                f"on the confirmation window ({gain_test:.1%} test -> "
+                f"{gain_conf:.1%} confirmation <= 0)")
+    else:
+        metrics["fixed_baseline_features"] = []
+        metrics["fixed_baseline_note"] = ("no common feature subset across disclosed "
+                                          "trials; fixed-baseline comparison not assessable")
+
+    if failures:
         return AuditResult(
-            "trial_disclosure", "fail", "NOISE",
-            f"selection bias: best of K={k} configurations tried on the test window "
-            f"(improvement {imp_test:.1%} over seasonal-naive) does not replicate on the "
-            f"held-out confirmation window (improvement {imp_conf:.1%} <= 0); the claimed "
-            f"edge is a multiple-comparison artifact, N=1 replication", metrics,
+            name="trial_disclosure", status="fail", reason_code="NOISE",
+            detail=f"selection bias: best of K={k} configurations tried on the test window; "
+                   + "; ".join(failures)
+                   + "; the claimed edge is a multiple-comparison artifact (N=1 replication)",
+            metrics=metrics,
         )
-    return AuditResult(
-        "trial_disclosure", "ok",
-        f"K={k} configurations disclosed; best-config improvement replicates on the "
-        f"confirmation window ({imp_test:.1%} test -> {imp_conf:.1%} confirmation)", metrics,
-    )
+    gain_test_m = metrics.get("selection_gain_test", 0.0)
+    material = (imp_test > cfg.min_improvement_for_replication
+                or gain_test_m > cfg.min_improvement_for_replication)
+    edges = (f"seasonal-naive edge {imp_test:.1%} test -> {imp_conf:.1%} confirmation"
+             + (f"; fixed-baseline selection gain {gain_test_m:.1%} test -> "
+                f"{metrics.get('selection_gain_confirmation', 0.0):.1%} confirmation"
+                if "selection_gain_test" in metrics else ""))
+    if not material:
+        detail = (f"K={k} configurations disclosed; best-of-K shows no material test-window "
+                  f"edge (improvement over seasonal-naive {imp_test:.1%}"
+                  + (f", over fixed baseline {gain_test_m:.1%}" if "selection_gain_test" in metrics else "")
+                  + f"; both <= {cfg.min_improvement_for_replication:.0%} materiality); "
+                  f"no replication correction needed")
+    else:
+        detail = (f"K={k} configurations disclosed; best-config edges replicate on the "
+                  f"confirmation window: {edges}")
+    return AuditResult(name="trial_disclosure", status="ok", reason_code="",
+                       detail=detail, metrics=metrics)
 
 
 def audit_timezone_integrity(data, art: CaseArtifact, cfg: AuditConfig) -> AuditResult:
@@ -300,28 +389,35 @@ def audit_timezone_integrity(data, art: CaseArtifact, cfg: AuditConfig) -> Audit
         )
     diffs = pd.Series(idx[1:] - idx[:-1]) if len(idx) > 1 else pd.Series(dtype="timedelta64[ns]")
     median_step = diffs.median() if len(diffs) else pd.Timedelta(0)
-    if median_step <= pd.Timedelta("1h"):
-        # hourly cadence: gap check via tz-aware local calendar (only if no dups;
-        # otherwise localize is undefined and the duplicate finding already fails)
-        if dups == 0 and idx.tz is None:
-            try:
-                localized = idx.tz_localize("UTC").tz_convert(cfg.domain_tz)
-                full_local = pd.date_range(localized.min(), localized.max(), freq="h",
-                                           tz=cfg.domain_tz)
-                missing = len(full_local.difference(localized.unique()))
-                if missing > 0:
-                    problems.append(f"{missing} missing wall-clock hours vs {cfg.domain_tz} calendar")
-            except Exception as e:  # ambiguous/nonexistent local times
-                problems.append(f"tz localization failed: {type(e).__name__}")
+    if median_step <= pd.Timedelta("1h") and dups == 0:
+        # hourly cadence: gap check against the domain-timezone wall calendar.
+        # Works for both naive indexes (localize to UTC first) and tz-aware
+        # ones (convert to the domain timezone). Only run when the frame has
+        # no duplicates: with duplicated wall labels the localize/convert is
+        # undefined and the duplicate finding already fails the audit.
+        try:
+            if idx.tz is None:
+                local_idx = idx.tz_localize("UTC").tz_convert(cfg.domain_tz)
+            else:
+                local_idx = idx.tz_convert(cfg.domain_tz)
+            full_local = pd.date_range(local_idx.min(), local_idx.max(), freq="h",
+                                       tz=cfg.domain_tz)
+            missing = len(full_local.difference(local_idx.unique()))
+            if missing > 0:
+                problems.append(f"{missing} missing wall-clock hours vs {cfg.domain_tz} calendar")
+        except Exception as e:  # ambiguous/nonexistent local times
+            problems.append(f"tz localization failed: {type(e).__name__}")
     if problems:
         return AuditResult(
-            "timezone_integrity", "fail", "ENVIRONMENT",
-            "timezone handling defect: " + "; ".join(problems) +
-            " (N=1 case, working frame inspected through the case feature builder)",
+            name="timezone_integrity", status="fail", reason_code="ENVIRONMENT",
+            detail="timezone handling defect: " + "; ".join(problems) +
+                   " (N=1 case, working frame inspected through the case feature builder)",
+            metrics={"duplicated_timestamps": dups},
         )
     cadence = "hourly" if median_step <= pd.Timedelta("1h") else "daily"
-    return AuditResult("timezone_integrity", "ok",
-                       f"no duplicate/gap anomalies at {cadence} cadence")
+    return AuditResult(name="timezone_integrity", status="ok", reason_code="",
+                       detail=f"no duplicate/gap anomalies at {cadence} cadence",
+                       metrics={"duplicated_timestamps": dups})
 
 
 AUDITS = (

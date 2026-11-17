@@ -66,7 +66,7 @@ def main() -> None:
     clean_mod = importlib.import_module(REGISTRY["clean_01_linear_forecast_features"][0])
     fp = 0
     for seed in range(1, 6):
-        dperm = block_permute_target(data, block=7, seed=seed)
+        dperm = block_permute_target(data_daily, block=7, seed=seed)
         artifact = clean_mod.run(dperm, win)
         v = run_verdict(dperm, artifact, cfg)
         fp += 1 if v["status"] == "PASS" else 0

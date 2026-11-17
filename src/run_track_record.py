@@ -1,9 +1,17 @@
 """Run the verifier track record: submitted cases -> verdict procedure -> results.
 
 Usage (from repo root):
-    evtr-venv/bin/python -m src.run_track_record --cases all
-    evtr-venv/bin/python -m src.run_track_record --case defect_01_look_ahead
-    evtr-venv/bin/python -m src.run_track_record --cases all --with-null-control
+    python -m src.run_track_record --cases all
+    python -m src.run_track_record --case defect_01_look_ahead
+    python -m src.run_track_record --cases all --with-null-control
+
+Partial runs: --case (repeatable) or an explicit --cases id1,id2 list runs only
+the named cases. Per-case JSON files are (re)written for the cases actually
+run; the full results/track_record.csv is NOT touched by a partial run (it is
+rewritten only when the run covers all registered cases), so a single-case
+probe cannot overwrite the full-battery summary. --with-null-control always
+runs the full N=5 NC-NULL battery on the DAILY dataset (independent of which
+cases were selected) and rewrites results/null_control.csv.
 """
 
 from __future__ import annotations
@@ -36,6 +44,8 @@ REGISTRY = {
     "defect_04_target_leakage": ("src.defects.target_leakage", True, "daily"),
     "defect_05_cherry_picked_metric": ("src.defects.cherry_picked_metric", True, "daily"),
     "defect_06_selection_bias": ("src.defects.selection_bias", True, "daily"),
+    "defect_07_seasonal_naive_only": ("src.defects.seasonal_naive_only", True, "hourly"),
+    "defect_08_search_overfit": ("src.defects.search_overfit", True, "daily"),
     "clean_01_linear_forecast_features": ("src.clean_cases.clean_pipeline_01", False, "daily"),
     "clean_02_ridge_scaled": ("src.clean_cases.clean_pipeline_02", False, "daily"),
     "clean_03_gradient_boosting": ("src.clean_cases.clean_pipeline_03", False, "daily"),
@@ -89,18 +99,26 @@ def write_csv(path: Path, rows: list[dict]) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--cases", default="all", help="comma-separated case ids or 'all'")
+    ap.add_argument("--cases", default=None, help="comma-separated case ids or 'all'")
     ap.add_argument("--case", action="append", default=[], help="single case id (repeatable)")
     ap.add_argument("--with-null-control", action="store_true",
                     help=f"also run {NULL_CONTROL_ID}: N={NULL_CONTROL_N} block-permuted "
                          f"target runs of the clean pipeline; procedure must not PASS")
     args = ap.parse_args()
 
-    if args.cases == "all":
+    # --case (no explicit --cases) runs ONLY the named cases; --cases all runs
+    # the full registry. An explicit --cases list is extended by --case.
+    if args.cases is None:
+        ids = list(args.case)
+    elif args.cases == "all":
         ids = list(REGISTRY)
     else:
         ids = [c.strip() for c in args.cases.split(",") if c.strip()]
-    ids += [c for c in args.case if c not in ids]
+        ids += [c for c in args.case if c not in ids]
+    if not ids:
+        print("no cases selected; use --cases all or --case <id> "
+              f"(known: {list(REGISTRY)})")
+        return 2
     unknown = [c for c in ids if c not in REGISTRY]
     if unknown:
         print(f"unknown cases: {unknown}; known: {list(REGISTRY)}")
@@ -133,13 +151,19 @@ def main() -> int:
               f"{'/' + r['reason_code'] if r['reason_code'] else ''}"
               f" reported_mae={r['_reported_mae']:.1f}")
 
-    write_csv(RESULTS_DIR / "track_record.csv", rows)
+    covers_all = set(ids) == set(REGISTRY)
+    if covers_all:
+        write_csv(RESULTS_DIR / "track_record.csv", rows)
+    else:
+        print(f"[partial run] {len(ids)}/{len(REGISTRY)} cases; "
+              f"results/track_record.csv NOT overwritten (full-battery summary is "
+              f"rewritten only by --cases all)")
 
     if args.with_null_control:
         clean_mod = importlib.import_module(REGISTRY["clean_01_linear_forecast_features"][0])
         nc_rows = []
         for seed in range(1, NULL_CONTROL_N + 1):
-            dperm = block_permute_target(data, block=7, seed=seed)
+            dperm = block_permute_target(data_daily, block=7, seed=seed)
             artifact = clean_mod.run(dperm, win)
             v = run_verdict(dperm, artifact, cfg)
             false_pass = 1 if v["status"] == "PASS" else 0

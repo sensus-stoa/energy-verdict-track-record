@@ -70,9 +70,10 @@ def block_permute_target(df: pd.DataFrame, block: int = 7, seed: int = 0,
     Destroys the alignment between target and all exogenous/calendar features
     beyond the block scale, while preserving the within-block shape and the
     marginal distribution of the target. This is NOT a naive point shuffle of
-    labels (invalid on trended data per V-PTM-001 claim C-04); it is a block
-    surrogate used ONLY as a negative control on deliberately destroyed data,
-    never as a significance test on real data.
+    labels (invalid on trended data: it destroys the trend/seasonal structure
+    and produces miscalibrated nulls); it is a block surrogate used ONLY as a
+    negative control on deliberately destroyed data, never as a significance
+    test on real data.
     """
     rng = np.random.default_rng(seed)
     out = df.copy()

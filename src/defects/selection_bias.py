@@ -1,13 +1,16 @@
 """D6 - DEFECTIVE case: selection bias, best of K configurations on the test
 window.
 
-Twenty linear configurations (calendar features + m pure-noise columns,
-m = 10..200) are tried on the TEST window and the best one is reported.
-None of the configurations has real skill beyond the calendar terms, so the
-apparent edge of the winner is a multiple-comparison artifact: it does not
-replicate on the held-out confirmation window. The trial log is disclosed
-(the undisclosed-search variant is out of scope for this record version,
-see limitations).
+Twenty exchangeable linear configurations are tried on the TEST window and
+the best one is reported. Each configuration is the calendar base
+(doy_sin, doy_cos, dow_weekend) plus 20 pure-noise columns drawn with its
+own seed (config k uses noise seed k; noise columns are namespaced
+c<k>_n* so no two configurations share a noise column). None of the
+configurations has real skill beyond the calendar terms, so the apparent
+edge of the winner over the fixed unsearched calendar configuration is a
+multiple-comparison artifact: it does not replicate on the held-out
+confirmation window. The trial log is disclosed (the undisclosed-search
+variant is out of scope for this record version, see limitations).
 """
 
 from __future__ import annotations
@@ -24,9 +27,9 @@ IS_DEFECTIVE = True
 DEFECT_TYPE = "selection_bias"
 
 BASE_FEATURES = ["doy_sin", "doy_cos", "dow_weekend"]
-N_NOISE_COLS = 200
+NOISE_COLS_PER_CONFIG = 20
 NOISE_SCALE = 3000.0
-N_CONFIGS = 20   # m = 10, 20, ..., 200 noise columns
+N_CONFIGS = 20   # config k: calendar base + 20 noise columns, seed k
 
 CLAIM = CaseClaim(
     statement=("Day-ahead daily load forecast: MAE <= 3.5% of mean test-window load, "
@@ -37,18 +40,28 @@ CLAIM = CaseClaim(
 
 
 def build_features(data: pd.DataFrame) -> pd.DataFrame:
+    """Calendar base + every configuration's noise block in one frame.
+
+    Config k (k = 1..N_CONFIGS) gets 20 noise columns named c<k>_n001..c<k>_n020,
+    drawn from default_rng(k). Column names are unique per configuration, so the
+    intersection of all disclosed trial feature sets is exactly the calendar
+    base - the audit's fixed unsearched baseline.
+    """
     base = add_case_features(data)
-    rng = np.random.default_rng(777)   # deterministic noise columns
-    noise = pd.DataFrame(
-        {f"n{i:03d}": rng.normal(0.0, NOISE_SCALE, len(base))
-         for i in range(1, N_NOISE_COLS + 1)},
-        index=base.index,
-    )
-    return pd.concat([base, noise], axis=1)
+    blocks = []
+    for k in range(1, N_CONFIGS + 1):
+        rng = np.random.default_rng(k)   # deterministic, per-configuration seed
+        blocks.append(pd.DataFrame(
+            {f"c{k:02d}_n{j:03d}": rng.normal(0.0, NOISE_SCALE, len(base))
+             for j in range(1, NOISE_COLS_PER_CONFIG + 1)},
+            index=base.index,
+        ))
+    return pd.concat([base] + blocks, axis=1)
 
 
-def config_features(m: int) -> list[str]:
-    return BASE_FEATURES + [f"n{i:03d}" for i in range(1, m + 1)]
+def config_features(k: int) -> list[str]:
+    return BASE_FEATURES + [f"c{k:02d}_n{j:03d}"
+                            for j in range(1, NOISE_COLS_PER_CONFIG + 1)]
 
 
 def run(data: pd.DataFrame, windows: Windows) -> CaseArtifact:
@@ -56,9 +69,9 @@ def run(data: pd.DataFrame, windows: Windows) -> CaseArtifact:
     trial_log = []
     best = None
     for k in range(1, N_CONFIGS + 1):
-        feats = config_features(10 * k)
+        feats = config_features(k)
         _, preds, m = fit_eval(feat_df, feats, windows.train, windows.test)
-        entry = {"config_id": f"m{10 * k:03d}", "features": feats, "test_mae": m}
+        entry = {"config_id": f"k{k:02d}", "features": feats, "test_mae": m}
         trial_log.append(entry)
         if best is None or m < best["test_mae"]:
             best = entry
@@ -79,7 +92,7 @@ def run(data: pd.DataFrame, windows: Windows) -> CaseArtifact:
         defect_type=DEFECT_TYPE,
         claim=CLAIM,
         reported_mae=reported,
-        predictions=preds,   # predictions of the LAST fitted config; reported number = best of 20
+        predictions=preds,   # predictions of the winning config; reported = best of 20
         windows=windows,
         model=None,          # no single "the" model: the artifact IS the trial log
         feature_names_used=best["features"],
