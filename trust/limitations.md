@@ -6,9 +6,16 @@
   one per defect class. Wilson 95% CI [0.676, 1.000]. Eight detections
   across eight defect classes demonstrate the mechanism per class; they are
   not a reliability estimate for unseen defect variants or for repeated
-  runs of the same class.
+  runs of the same class. The interval also pools eight different defect
+  classes as exchangeable Bernoulli trials: it describes this specific
+  mixture, not a class-independent "procedure sensitivity".
 - Specificity is measured on N=5 clean cases (5/5 passed). Wilson 95% CI
-  [0.566, 1.000].
+  [0.566, 1.000]. All five clean cases are single-configuration (K=1):
+  specificity does not yet measure the false-accusation rate of the
+  trial-disclosure audit on honest multi-configuration searches (its
+  fail-branch is covered by defect_06/defect_08, its ok-branch for K>1 by
+  none) - a clean best-of-K case whose winner genuinely replicates on the
+  confirmation window is the planned next record version.
 - NC-NULL: N=5, false PASS 0/5, Wilson 95% CI [0.000, 0.434], rule-of-three
   upper bound about 60%. The sets are small by design; the numbers are not
   a power statement.
@@ -102,7 +109,10 @@
   distribution of the target. The control verifies that the procedure
   refuses to certify claims on alignment-destroyed data; it is not an
   exhaustive null battery and it does not test pipelines whose claimed skill
-  rests only on short-lag autocorrelation.
+  rests only on short-lag autocorrelation. In the committed runs the null
+  control fails through the claim-conditions audit (absolute threshold and
+  must-beat): the control demonstrates refusal to certify, not a separate
+  discrimination test between null data and genuine skill.
 
 ## Changes in version 5 (honest changelog from version 4)
 
