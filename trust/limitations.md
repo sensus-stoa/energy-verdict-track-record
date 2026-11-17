@@ -169,14 +169,14 @@ version and re-verified on the locked code:
   that E-IDs are bound to a specific record version and content is
   identified by record_version + evidence_id + sha256; mechanical
   validation of the record runs with the canonical protocol checker
-  `tc` (trust_check v0.1.0, repository sensus-stoa/cv0-trust-protocol,
-  release binary sha256 124b20ab3984eb548088966f448d514f45ff2799584cffeb
-  adbc3caba38a19d3b). The checker prints the absolute local repository
-  root into its report; the committed report normalizes that single
-  `root` field to "." after the run - every check and every other byte of
-  the tool output is verbatim. The report is committed immediately after
-  the record commit it verifies; the checked commit is the report
-  commit's parent.
+  `tc` (trust_check v0.2.1, repository sensus-stoa/cv0-trust-protocol,
+  release binary tc-v0.2.1-linux-amd64, sha256
+  9ad4c66ad70b2903af84348990109afe1003bb26238ea18b734967f52733de48).
+  The report is the checker's verbatim output: root is recorded as passed
+  (`.` when run from the repository root - no machine-local paths), and
+  checked_commit names the HEAD of the checked work tree. The report is
+  committed immediately after the record commit it verifies; the checked
+  commit is the report commit's parent.
 - Non-change note: criteria C-01..C-12 from version 4 are restated with
   updated reference values where the window fix changed numbers; C-11's
   PASS criterion is restated to match the reworked trial-disclosure audit

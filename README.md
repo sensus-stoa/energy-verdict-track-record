@@ -55,14 +55,14 @@ status; an agent never signs.
     tc -root .
 
 Mechanical validation of the record uses the canonical protocol checker
-`tc` (trust_check v0.1.0) from https://github.com/sensus-stoa/cv0-trust-protocol
-(release binary tc-v0.1.0-linux-amd64, sha256 124b20ab3984eb548088966f448d
-514f45ff2799584cffebadc3caba38a19d3b; build contract in that repository).
-The committed trust_check_report.json is its verbatim output with a single
-normalization: the `root` field (the checker prints the absolute local
-path) is replaced by "." after the run; every check and every other byte
-is untouched. The report is committed immediately after the record commit
-it verifies, so the checked commit is the report commit's parent.
+`tc` (trust_check v0.2.1) from https://github.com/sensus-stoa/cv0-trust-protocol
+(release binary tc-v0.2.1-linux-amd64, sha256
+9ad4c66ad70b2903af84348990109afe1003bb26238ea18b734967f52733de48; build
+contract in that repository). The committed trust_check_report.json is its
+verbatim output: tc records the root as passed on the command line (run as
+`tc -root .`, so the report carries no machine-local paths) and carries
+checked_commit. The report is committed immediately after the record
+commit it verifies, so the checked commit is the report commit's parent.
 
 Single-case probe (runs ONLY the named case; rewrites that case's
 results/per_case/<id>.json but never the full-battery
