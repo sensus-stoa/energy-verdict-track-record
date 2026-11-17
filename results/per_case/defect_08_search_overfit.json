@@ -1,0 +1,115 @@
+{
+  "case_id": "defect_08_search_overfit",
+  "is_defective": true,
+  "reported_mae": 1617.4,
+  "claim": {
+    "statement": "Day-ahead daily load forecast: MAE <= 3.5% of mean test-window load, better than seasonal-naive and persistence baselines on the same window.",
+    "max_mae_pct_of_mean": 3.5,
+    "must_beat": [
+      "seasonal_naive",
+      "persistence"
+    ]
+  },
+  "verdict": {
+    "status": "FAIL",
+    "reason_code": "NOISE",
+    "audits": [
+      {
+        "name": "prediction_alignment",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "predictions cover the pre-registered test window exactly",
+        "metrics": {
+          "n_test_rows": 30
+        }
+      },
+      {
+        "name": "train_test_isolation",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "",
+        "metrics": {}
+      },
+      {
+        "name": "timezone_integrity",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "no duplicate/gap anomalies at daily cadence",
+        "metrics": {
+          "duplicated_timestamps": 0
+        }
+      },
+      {
+        "name": "feature_target_proximity",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "no feature is a near-copy of the target",
+        "metrics": {
+          "suspects": []
+        }
+      },
+      {
+        "name": "deployment_consistency",
+        "status": "inconclusive",
+        "reason_code": "DATA",
+        "detail": "feature availability unknown to the audit for: ['c10_n001', 'c10_n002', 'c10_n003', 'c10_n004', 'c10_n005', 'c10_n006', 'c10_n007', 'c10_n008', 'c10_n009', 'c10_n010', 'c10_n011', 'c10_n012', 'c10_n013', 'c10_n014', 'c10_n015', 'c10_n016', 'c10_n017', 'c10_n018', 'c10_n019', 'c10_n020'] (N=1 case)",
+        "metrics": {}
+      },
+      {
+        "name": "metric_reproduction",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "reported MAE reproduces from predictions (diff 0.0000%)",
+        "metrics": {
+          "reported_mae": 1617.4,
+          "recomputed_mae": 1617.4,
+          "relative_diff": 0.0
+        }
+      },
+      {
+        "name": "claim_conditions",
+        "status": "ok",
+        "reason_code": "",
+        "detail": "claim holds: MAE 1617 <= 1878; beats persistence 2727 and seasonal-naive 3157",
+        "metrics": {
+          "recomputed_mae": 1617.4,
+          "threshold_mae": 1878.3,
+          "persistence_mae": 2726.9,
+          "seasonal_naive_mae": 3157.3,
+          "mean_load_test_window": 53664.9,
+          "baseline_lags": [
+            1,
+            7
+          ]
+        }
+      },
+      {
+        "name": "trial_disclosure",
+        "status": "fail",
+        "reason_code": "NOISE",
+        "detail": "selection bias: best of K=20 configurations tried on the test window; selection gain over the fixed unsearched baseline does not replicate on the confirmation window (4.8% test -> -5.0% confirmation <= 0); the claimed edge is a multiple-comparison artifact (N=1 replication)",
+        "metrics": {
+          "K": 20,
+          "best_test_mae": 1617.4,
+          "confirmation_mae": 1844.6,
+          "seasonal_naive_test_mae": 3157.3,
+          "seasonal_naive_confirmation_mae": 5078.3,
+          "improvement_test": 0.4877,
+          "improvement_confirmation": 0.6368,
+          "min_improvement_for_replication": 0.03,
+          "fixed_baseline_features": [
+            "temp_forecast",
+            "doy_sin",
+            "doy_cos",
+            "dow_weekend",
+            "load_lag1"
+          ],
+          "fixed_baseline_test_mae": 1699.3,
+          "fixed_baseline_confirmation_mae": 1757.3,
+          "selection_gain_test": 0.0482,
+          "selection_gain_confirmation": -0.0497
+        }
+      }
+    ]
+  }
+}

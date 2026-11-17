@@ -18,9 +18,9 @@
         "name": "prediction_alignment",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "predictions cover the pre-registered test window exactly",
         "metrics": {
-          "n_test_rows": 31
+          "n_test_rows": 30
         }
       },
       {
@@ -33,15 +33,17 @@
       {
         "name": "timezone_integrity",
         "status": "ok",
-        "reason_code": "no duplicate/gap anomalies at daily cadence",
-        "detail": "",
-        "metrics": {}
+        "reason_code": "",
+        "detail": "no duplicate/gap anomalies at daily cadence",
+        "metrics": {
+          "duplicated_timestamps": 0
+        }
       },
       {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "no feature is a near-copy of the target",
         "metrics": {
           "suspects": []
         }
@@ -50,7 +52,7 @@
         "name": "deployment_consistency",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "all 5 used features available at inference time",
         "metrics": {
           "n_features": 5
         }
@@ -59,35 +61,35 @@
         "name": "metric_reproduction",
         "status": "fail",
         "reason_code": "CONFLICT_EVIDENCE",
-        "detail": "reported MAE 996.5 does not reproduce from returned predictions on the full test window (1713.6, diff 71.96% > 1%); reported number not reproducible as stated (N=1 recomputation)",
+        "detail": "reported MAE 996.5 does not reproduce from returned predictions on the full test window (1699.3, diff 70.53% > 1%); reported number not reproducible as stated (N=1 recomputation)",
         "metrics": {
           "reported_mae": 996.5,
-          "recomputed_mae": 1713.6,
-          "relative_diff": 0.71965
+          "recomputed_mae": 1699.3,
+          "relative_diff": 0.70527
         }
       },
       {
         "name": "claim_conditions",
         "status": "ok",
-        "reason_code": "claim holds: MAE 1714 <= 1880; beats persistence 2888 and seasonal-naive 3086",
-        "detail": {
-          "recomputed_mae": 1713.6,
-          "threshold_mae": 1879.5,
-          "persistence_mae": 2887.5,
-          "seasonal_naive_mae": 3086.3,
-          "mean_load_test_window": 53701.4,
+        "reason_code": "",
+        "detail": "claim holds: MAE 1699 <= 1878; beats persistence 2727 and seasonal-naive 3157",
+        "metrics": {
+          "recomputed_mae": 1699.3,
+          "threshold_mae": 1878.3,
+          "persistence_mae": 2726.9,
+          "seasonal_naive_mae": 3157.3,
+          "mean_load_test_window": 53664.9,
           "baseline_lags": [
             1,
             7
           ]
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "trial_disclosure",
         "status": "ok",
-        "reason_code": "single pre-registered configuration (K=1); no multiplicity correction needed",
-        "detail": "",
+        "reason_code": "",
+        "detail": "single pre-registered configuration (K=1); no multiplicity correction needed",
         "metrics": {
           "K": 1
         }

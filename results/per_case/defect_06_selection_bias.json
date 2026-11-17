@@ -1,7 +1,7 @@
 {
   "case_id": "defect_06_selection_bias",
   "is_defective": true,
-  "reported_mae": 2607.8,
+  "reported_mae": 2519.0,
   "claim": {
     "statement": "Day-ahead daily load forecast: MAE <= 3.5% of mean test-window load, better than seasonal-naive and persistence baselines on the same window.",
     "max_mae_pct_of_mean": 3.5,
@@ -18,9 +18,9 @@
         "name": "prediction_alignment",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "predictions cover the pre-registered test window exactly",
         "metrics": {
-          "n_test_rows": 31
+          "n_test_rows": 30
         }
       },
       {
@@ -33,15 +33,17 @@
       {
         "name": "timezone_integrity",
         "status": "ok",
-        "reason_code": "no duplicate/gap anomalies at daily cadence",
-        "detail": "",
-        "metrics": {}
+        "reason_code": "",
+        "detail": "no duplicate/gap anomalies at daily cadence",
+        "metrics": {
+          "duplicated_timestamps": 0
+        }
       },
       {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "no feature is a near-copy of the target",
         "metrics": {
           "suspects": []
         }
@@ -50,31 +52,31 @@
         "name": "deployment_consistency",
         "status": "inconclusive",
         "reason_code": "DATA",
-        "detail": "feature availability unknown to the audit for: ['n001', 'n002', 'n003', 'n004', 'n005', 'n006', 'n007', 'n008', 'n009', 'n010'] (N=1 case)",
+        "detail": "feature availability unknown to the audit for: ['c09_n001', 'c09_n002', 'c09_n003', 'c09_n004', 'c09_n005', 'c09_n006', 'c09_n007', 'c09_n008', 'c09_n009', 'c09_n010', 'c09_n011', 'c09_n012', 'c09_n013', 'c09_n014', 'c09_n015', 'c09_n016', 'c09_n017', 'c09_n018', 'c09_n019', 'c09_n020'] (N=1 case)",
         "metrics": {}
       },
       {
         "name": "metric_reproduction",
         "status": "ok",
-        "reason_code": "reported MAE reproduces from predictions (diff 0.0000%)",
-        "detail": {
-          "reported_mae": 2607.8,
-          "recomputed_mae": 2607.8,
+        "reason_code": "",
+        "detail": "reported MAE reproduces from predictions (diff 0.0000%)",
+        "metrics": {
+          "reported_mae": 2519.0,
+          "recomputed_mae": 2519.0,
           "relative_diff": 0.0
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "claim_conditions",
         "status": "fail",
         "reason_code": "NOISE",
-        "detail": "claimed performance does not hold: MAE 2608 exceeds 3.5% of mean load (1880) (N=1 test window, baselines computed on the same window)",
+        "detail": "claimed performance does not hold: MAE 2519 exceeds 3.5% of mean load (1878) (N=1 test window, baselines computed on the same window)",
         "metrics": {
-          "recomputed_mae": 2607.8,
-          "threshold_mae": 1879.5,
-          "persistence_mae": 2887.5,
-          "seasonal_naive_mae": 3086.3,
-          "mean_load_test_window": 53701.4,
+          "recomputed_mae": 2519.0,
+          "threshold_mae": 1878.3,
+          "persistence_mae": 2726.9,
+          "seasonal_naive_mae": 3157.3,
+          "mean_load_test_window": 53664.9,
           "baseline_lags": [
             1,
             7
@@ -83,16 +85,28 @@
       },
       {
         "name": "trial_disclosure",
-        "status": "ok",
-        "reason_code": "K=20 configurations disclosed; best-config improvement replicates on the confirmation window (15.5% test -> 24.8% confirmation)",
-        "detail": {
+        "status": "fail",
+        "reason_code": "NOISE",
+        "detail": "selection bias: best of K=20 configurations tried on the test window; selection gain over the fixed unsearched baseline does not replicate on the confirmation window (6.1% test -> -1.3% confirmation <= 0); the claimed edge is a multiple-comparison artifact (N=1 replication)",
+        "metrics": {
           "K": 20,
-          "best_test_mae": 2607.8,
-          "confirmation_mae": 3872.7,
-          "improvement_test": 0.1551,
-          "improvement_confirmation": 0.2477
-        },
-        "metrics": {}
+          "best_test_mae": 2519.0,
+          "confirmation_mae": 3736.2,
+          "seasonal_naive_test_mae": 3157.3,
+          "seasonal_naive_confirmation_mae": 5078.3,
+          "improvement_test": 0.2021,
+          "improvement_confirmation": 0.2643,
+          "min_improvement_for_replication": 0.03,
+          "fixed_baseline_features": [
+            "doy_sin",
+            "doy_cos",
+            "dow_weekend"
+          ],
+          "fixed_baseline_test_mae": 2683.4,
+          "fixed_baseline_confirmation_mae": 3686.9,
+          "selection_gain_test": 0.0613,
+          "selection_gain_confirmation": -0.0134
+        }
       }
     ]
   }

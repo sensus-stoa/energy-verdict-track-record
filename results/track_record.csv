@@ -5,6 +5,8 @@ defect_03_backtest_contamination,True,FAIL,DATA,0,0,train window overlaps the te
 defect_04_target_leakage,True,FAIL,DATA,0,0,feature load_settlement = same-day realised load + reporting noise
 defect_05_cherry_picked_metric,True,FAIL,CONFLICT_EVIDENCE,0,0,reported MAE computed on the 20 lowest-error days of the 30-day window (silent trim)
 defect_06_selection_bias,True,FAIL,NOISE,0,0,best of K=20 configurations selected on the test window
+defect_07_seasonal_naive_only,True,FAIL,NOISE,0,0,"prediction = 168h lag disclosed as the model; passes the 6.0% absolute gate, fails must-beat seasonal-naive"
+defect_08_search_overfit,True,FAIL,NOISE,0,0,"best of K=20 configurations selected on the test window; winner satisfies the pre-registered claim (caught by trial-disclosure, not by claim conditions)"
 clean_01_linear_forecast_features,False,PASS,,0,0,single pre-registered configuration (K=1)
 clean_02_ridge_scaled,False,PASS,,0,0,"single pre-registered configuration (K=1), scaled Ridge"
 clean_03_gradient_boosting,False,PASS,,0,0,"single pre-registered configuration (K=1), gradient boosting"

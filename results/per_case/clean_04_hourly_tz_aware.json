@@ -18,7 +18,7 @@
         "name": "prediction_alignment",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "predictions cover the pre-registered test window exactly",
         "metrics": {
           "n_test_rows": 168
         }
@@ -33,15 +33,17 @@
       {
         "name": "timezone_integrity",
         "status": "ok",
-        "reason_code": "no duplicate/gap anomalies at hourly cadence",
-        "detail": "",
-        "metrics": {}
+        "reason_code": "",
+        "detail": "no duplicate/gap anomalies at hourly cadence",
+        "metrics": {
+          "duplicated_timestamps": 0
+        }
       },
       {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "no feature is a near-copy of the target",
         "metrics": {
           "suspects": []
         }
@@ -50,7 +52,7 @@
         "name": "deployment_consistency",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "all 5 used features available at inference time",
         "metrics": {
           "n_features": 5
         }
@@ -58,19 +60,20 @@
       {
         "name": "metric_reproduction",
         "status": "ok",
-        "reason_code": "reported MAE reproduces from predictions (diff 0.0000%)",
-        "detail": {
+        "reason_code": "",
+        "detail": "reported MAE reproduces from predictions (diff 0.0000%)",
+        "metrics": {
           "reported_mae": 108.1,
           "recomputed_mae": 108.1,
           "relative_diff": 0.0
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "claim_conditions",
         "status": "ok",
-        "reason_code": "claim holds: MAE 108 <= 148; beats persistence 184 and seasonal-naive 136",
-        "detail": {
+        "reason_code": "",
+        "detail": "claim holds: MAE 108 <= 148; beats persistence 184 and seasonal-naive 136",
+        "metrics": {
           "recomputed_mae": 108.1,
           "threshold_mae": 147.6,
           "persistence_mae": 183.9,
@@ -80,14 +83,13 @@
             24,
             168
           ]
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "trial_disclosure",
         "status": "ok",
-        "reason_code": "single pre-registered configuration (K=1); no multiplicity correction needed",
-        "detail": "",
+        "reason_code": "",
+        "detail": "single pre-registered configuration (K=1); no multiplicity correction needed",
         "metrics": {
           "K": 1
         }

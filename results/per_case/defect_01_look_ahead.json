@@ -1,7 +1,7 @@
 {
   "case_id": "defect_01_look_ahead",
   "is_defective": true,
-  "reported_mae": 1387.4,
+  "reported_mae": 1353.9,
   "claim": {
     "statement": "Day-ahead daily load forecast: MAE <= 3.5% of mean test-window load, better than seasonal-naive and persistence baselines on the same window.",
     "max_mae_pct_of_mean": 3.5,
@@ -18,9 +18,9 @@
         "name": "prediction_alignment",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "predictions cover the pre-registered test window exactly",
         "metrics": {
-          "n_test_rows": 31
+          "n_test_rows": 30
         }
       },
       {
@@ -33,15 +33,17 @@
       {
         "name": "timezone_integrity",
         "status": "ok",
-        "reason_code": "no duplicate/gap anomalies at daily cadence",
-        "detail": "",
-        "metrics": {}
+        "reason_code": "",
+        "detail": "no duplicate/gap anomalies at daily cadence",
+        "metrics": {
+          "duplicated_timestamps": 0
+        }
       },
       {
         "name": "feature_target_proximity",
         "status": "ok",
         "reason_code": "",
-        "detail": "",
+        "detail": "no feature is a near-copy of the target",
         "metrics": {
           "suspects": []
         }
@@ -50,48 +52,50 @@
         "name": "deployment_consistency",
         "status": "fail",
         "reason_code": "DATA",
-        "detail": "look-ahead leak: model uses features not available at inference time (['temp_actual']); re-run with deployment-realistic features gives MAE 1714 vs reported 1387 (gap 23.5%, N=1 retrain)",
+        "detail": "look-ahead leak: model uses features not available at inference time (['temp_actual']); deployment re-run MAE 1699 vs reported 1354: relative gap (deployment_mae - reported_mae) / reported_mae = 25.5% vs threshold 20% - impact above threshold (N=1 retrain)",
         "metrics": {
           "unavailable_features_used": [
             "temp_actual"
           ],
-          "deployment_mae": 1713.6,
-          "relative_gap": 0.235
+          "lookahead_gap_threshold": 0.2,
+          "deployment_mae": 1699.3,
+          "relative_gap": 0.2551,
+          "gap_exceeds_threshold": true
         }
       },
       {
         "name": "metric_reproduction",
         "status": "ok",
-        "reason_code": "reported MAE reproduces from predictions (diff 0.0000%)",
-        "detail": {
-          "reported_mae": 1387.4,
-          "recomputed_mae": 1387.4,
+        "reason_code": "",
+        "detail": "reported MAE reproduces from predictions (diff 0.0000%)",
+        "metrics": {
+          "reported_mae": 1353.9,
+          "recomputed_mae": 1353.9,
           "relative_diff": 0.0
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "claim_conditions",
         "status": "ok",
-        "reason_code": "claim holds: MAE 1387 <= 1880; beats persistence 2888 and seasonal-naive 3086",
-        "detail": {
-          "recomputed_mae": 1387.4,
-          "threshold_mae": 1879.5,
-          "persistence_mae": 2887.5,
-          "seasonal_naive_mae": 3086.3,
-          "mean_load_test_window": 53701.4,
+        "reason_code": "",
+        "detail": "claim holds: MAE 1354 <= 1878; beats persistence 2727 and seasonal-naive 3157",
+        "metrics": {
+          "recomputed_mae": 1353.9,
+          "threshold_mae": 1878.3,
+          "persistence_mae": 2726.9,
+          "seasonal_naive_mae": 3157.3,
+          "mean_load_test_window": 53664.9,
           "baseline_lags": [
             1,
             7
           ]
-        },
-        "metrics": {}
+        }
       },
       {
         "name": "trial_disclosure",
         "status": "ok",
-        "reason_code": "single pre-registered configuration (K=1); no multiplicity correction needed",
-        "detail": "",
+        "reason_code": "",
+        "detail": "single pre-registered configuration (K=1); no multiplicity correction needed",
         "metrics": {
           "K": 1
         }
